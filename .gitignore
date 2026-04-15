@@ -1,0 +1,18 @@
+# Chặn thư mục build và file tạm
+build/
+dist/
+nbbuild/
+nbdist/
+
+# Chặn cấu hình riêng tư (quan trọng nhất để 2 máy không xung đột)
+nbproject/private/
+private/
+
+# Chặn file log
+*.log
+
+# Chỉ giữ lại src, web và cấu hình khung của NetBeans
+!/src/
+!/web/
+!/nbproject/project.xml
+!/nbproject/project.properties
