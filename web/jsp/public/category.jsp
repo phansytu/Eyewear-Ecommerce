@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -126,12 +127,13 @@
                 <div class="sidebar-section shadow-sm">
                     <h3 class="sidebar-title">Khám phá theo danh mục</h3>
                     <ul class="sidebar-list">
-                        <li><a href="#">Kính râm phi công (Aviator)</a></li>
-                        <li><a href="#">Kính gọng vuông</a></li>
-                        <li><a href="#">Kính gọng tròn</a></li>
-                        <li><a href="#">Kính thể thao ôm sát</a></li>
-                        <li><a href="#">Tròng kính râm cận</a></li>
-                    </ul>
+    <li><a href="${root}/category?type=kinh-ram-nam">Kính râm nam</a></li>
+    <li><a href="${root}/category?type=gong-kinh-nu">Gọng kính nữ</a></li>
+    <li><a href="${root}/category?type=kinh-chong-anh-sang-xanh">Kính chống ánh sáng xanh</a></li>
+    <li><a href="${root}/category?type=gong-titanium">Gọng Titanium</a></li>
+    <li><a href="${root}/category?type=kinh-rayban">Thương hiệu Ray-Ban</a></li>
+    <li><a href="${root}/category?type=phu-kien-kinh">Phụ kiện & Vệ sinh</a></li>
+</ul>
                 </div>
                 
                 <div class="sidebar-section shadow-sm text-center p-0 overflow-hidden">

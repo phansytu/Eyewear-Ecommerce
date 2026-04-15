@@ -97,13 +97,13 @@
                         </div>
                     </form>
                     <div class="search-tags mt-2">
-                        <a href="#">kính râm nam</a>
-                        <a href="#">gọng kính nữ</a>
-                        <a href="#">kính chống ánh sáng xanh</a>
-                        <a href="#">gọng titanium</a>
-                        <a href="#">kính RayBan</a>
-                        <a href="#">phụ kiện kính</a>
-                    </div>
+    <a href="${root}/category?type=kinh-ram-nam">kính râm nam</a>
+    <a href="${root}/category?type=gong-kinh-nu">gọng kính nữ</a>
+    <a href="${root}/category?type=kinh-chong-anh-sang-xanh">kính chống ánh sáng xanh</a>
+    <a href="${root}/category?type=gong-titanium">gọng titanium</a>
+    <a href="${root}/category?type=kinh-rayban">kính RayBan</a>
+    <a href="${root}/category?type=phu-kien-kinh">phụ kiện kính</a>
+</div>
                 </div>
                 
                 <div class="col-lg-3 col-md-3">
@@ -172,32 +172,32 @@
         <div class="row g-4">
             <div class="col-lg-2 d-none d-lg-block">
                 <div class="sidebar-menu shadow-sm">
-                    <h3 class="menu-title">Danh mục Kính</h3>
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-glasses text-info fs-5"></i> Gọng Kính Thời Trang
-                    </a>
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-sun text-warning fs-5"></i> Kính Râm / Kính Mát
-                    </a>
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-desktop text-primary fs-5"></i> Kính Chống Ánh Sáng Xanh
-                    </a>
-                    <a href="#" class="menu-item">
-                        <i class="far fa-eye text-success fs-5"></i> Kính Cận / Viễn / Loạn
-                    </a>
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-biking text-danger fs-5"></i> Kính Thể Thao / Đi Đường
-                    </a>
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-child text-pink fs-5" style="color: hotpink;"></i> Kính Mắt Trẻ Em
-                    </a>
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-circle-notch text-secondary fs-5"></i> Tròng Kính Các Loại
-                    </a>
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-spray-can text-dark fs-5"></i> Phụ Kiện & Vệ Sinh
-                    </a>
-                </div>
+    <h3 class="menu-title">Danh mục Kính</h3>
+    <a href="${root}/category?type=gong-kinh-thoi-trang" class="menu-item">
+        <i class="fas fa-glasses text-info fs-5"></i> Gọng Kính Thời Trang
+    </a>
+    <a href="${root}/category?type=kinh-ram-nam" class="menu-item">
+        <i class="fas fa-sun text-warning fs-5"></i> Kính Râm / Kính Mát
+    </a>
+    <a href="${root}/category?type=kinh-chong-anh-sang-xanh" class="menu-item">
+        <i class="fas fa-desktop text-primary fs-5"></i> Kính Chống Ánh Sáng Xanh
+    </a>
+    <a href="${root}/category?type=kinh-can-vien-loan" class="menu-item">
+        <i class="far fa-eye text-success fs-5"></i> Kính Cận / Viễn / Loạn
+    </a>
+    <a href="${root}/category?type=kinh-the-thao" class="menu-item">
+        <i class="fas fa-biking text-danger fs-5"></i> Kính Thể Thao / Đi Đường
+    </a>
+    <a href="${root}/category?type=kinh-tre-em" class="menu-item">
+        <i class="fas fa-child text-pink fs-5" style="color: hotpink;"></i> Kính Mắt Trẻ Em
+    </a>
+    <a href="${root}/category?type=trong-kinh" class="menu-item">
+        <i class="fas fa-circle-notch text-secondary fs-5"></i> Tròng Kính Các Loại
+    </a>
+    <a href="${root}/category?type=phu-kien-kinh" class="menu-item">
+        <i class="fas fa-spray-can text-dark fs-5"></i> Phụ Kiện & Vệ Sinh
+    </a>
+</div>
             </div>
 
             <div class="col-lg-10">
