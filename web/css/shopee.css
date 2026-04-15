@@ -1,0 +1,151 @@
+/* --- 1. Biến màu sắc & Reset --- */
+:root {
+    --shopee-orange: #ee4d2d;
+    --shopee-orange-hover: #f05d40;
+    --shopee-bg: #f5f5f5;
+    --text-color: #000000de;
+}
+
+body {
+    background-color: var(--shopee-bg);
+    color: var(--text-color);
+    font-family: -apple-system, Helvetica Neue, Helvetica, Roboto, Arial, sans-serif;
+    font-size: 14px; /* Shopee dùng size chữ nhỏ để hiển thị nhiều thông tin */
+}
+
+/* --- 2. Header (Thanh công cụ & Tìm kiếm) --- */
+.header-main {
+    background: linear-gradient(-180deg, #f53d2d, #f63) !important;
+    padding: 15px 0;
+}
+
+.search-form .input-group {
+    background: #fff;
+    border-radius: 2px;
+    padding: 3px;
+}
+
+.search-form input {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.search-form .btn-danger {
+    background-color: var(--shopee-orange);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 2px;
+}
+
+/* --- 3. Banner & Khuyến mãi --- */
+.banner-main {
+    border-radius: 2px !important; /* Shopee ít dùng bo góc tròn lớn */
+    overflow: hidden;
+}
+
+.banner-overlay {
+    background: rgba(0, 0, 0, 0.2);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --- 4. Danh sách sản phẩm (Grid) --- */
+.product-grid {
+    margin-top: 20px;
+}
+
+.product-card {
+    border: 1px solid transparent !important;
+    border-radius: 2px !important;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    background: #fff;
+}
+
+.product-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.0625rem 1.25rem 0 rgba(0,0,0,.1) !important;
+    border-color: var(--shopee-orange) !important;
+    z-index: 1;
+}
+
+/* Ảnh sản phẩm */
+.product-card .card-img-top {
+    border-radius: 2px 2px 0 0;
+    height: 200px !important; /* Giảm chiều cao để card cân đối hơn */
+    object-fit: cover;
+}
+
+/* Nội dung Card */
+.product-card .card-body {
+    padding: 10px !important;
+}
+
+.product-card .card-title a {
+    font-size: 12px;
+    line-height: 14px;
+    height: 28px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* Giới hạn 2 dòng tên */
+    overflow: hidden;
+    color: var(--text-color);
+}
+
+.brand-badge {
+    font-size: 10px;
+    padding: 2px 5px;
+    background-color: #f0f0f0 !important;
+}
+
+/* Giá tiền */
+.price-sale {
+    color: var(--shopee-orange) !important;
+    font-size: 16px !important;
+}
+
+.price-old {
+    font-size: 12px !important;
+    color: #0000008a !important;
+}
+
+/* Nút thêm vào giỏ */
+.add-to-cart-btn {
+    background-color: #fff !important;
+    color: var(--shopee-orange) !important;
+    border: 1px solid var(--shopee-orange) !important;
+    font-size: 12px;
+    padding: 5px;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #fff5f1 !important;
+}
+
+/* Nhãn Nổi bật/Yêu thích */
+.badge.bg-warning {
+    background-color: var(--shopee-orange) !important;
+    font-size: 10px !important;
+    padding: 2px 4px;
+    border-radius: 0 2px 2px 0;
+}
+
+/* --- 5. Footer --- */
+.shopee-footer {
+    border-top: 4px solid var(--shopee-orange);
+    background-color: #fbfbfb !important;
+    color: #0000008a !important;
+}
+
+.shopee-footer h5 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000000de !important;
+}
+
+.shopee-footer .list-unstyled li {
+    font-size: 12px;
+    margin-bottom: 8px;
+}
