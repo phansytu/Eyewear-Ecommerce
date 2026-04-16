@@ -125,11 +125,15 @@
             formData.append('password', document.getElementById('password').value);
             
             try {
-                const response = await fetch('${pageContext.request.contextPath}/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
-                });
+                // Mã mới đã fix
+const response = await fetch('${pageContext.request.contextPath}/login', {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest'  // <-- THÊM DÒNG NÀY ĐỂ SERVLET NHẬN DIỆN LÀ AJAX
+    },
+    body: formData
+});
                 const data = await response.json();
                 
                 if (data.success) {
