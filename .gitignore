@@ -4,6 +4,12 @@ dist/
 nbbuild/
 nbdist/
 
+# --- CHIA SẺ CẤU HÌNH SERVER & THƯ VIỆN ---
+!/nbproject/project.xml
+!/nbproject/project.properties
+!/nbproject/genfiles.properties
+!/nbproject/ant-deploy.xml
+
 # Chặn cấu hình riêng tư (quan trọng nhất để 2 máy không xung đột)
 nbproject/private/
 private/
