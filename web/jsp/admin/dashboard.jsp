@@ -32,9 +32,11 @@
             <span>${sessionScope.user.username}</span>
         </div>
         <a href="#" class="active"><i class="fas fa-tachometer-alt me-2"></i> Tổng quan</a>
-        <a href="#"><i class="fas fa-box me-2"></i> Quản lý sản phẩm</a>
-        <a href="#"><i class="fas fa-list me-2"></i> Quản lý danh mục</a>
-        <a href="#"><i class="fas fa-shopping-cart me-2"></i> Quản lý đơn hàng</a>
+        <a href="${pageContext.request.contextPath}/admin/products"><i class="fas fa-box me-2"></i> Quản lý sản phẩm</a>
+        <a href="${pageContext.request.contextPath}/jsp/public/category.jsp" class="list-group-item list-group-item-action"><i class="fas fa-list me-2"></i> Quản lý danh mục</a>
+        <a href="${pageContext.request.contextPath}/jsp/admin/order.jsp" class="list-group-item list-group-item-action">
+                            <i class="fas fa-shopping-cart me-2"></i>Quản lý đơn hàng
+                        </a>
         <a href="#"><i class="fas fa-users me-2"></i> Quản lý người dùng</a>
         <a href="${root}/logout" class="text-danger mt-5"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
     </div>
@@ -42,7 +44,7 @@
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Bảng điều khiển</h2>
-            <a href="${root}/home" class="btn btn-outline-primary"><i class="fas fa-external-link-alt"></i> Xem Website</a>
+            <a href="${root}/home" class="btn btn-outline-primary"><i class="fas fa-external-link-alt"></i> Trang chủ</a>
         </div>
 
         <div class="row g-3 mb-4">

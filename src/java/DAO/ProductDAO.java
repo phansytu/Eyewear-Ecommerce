@@ -4,6 +4,7 @@ import model.Product;
 import model.ProductImage;
 import model.ProductVariant;
 import util.DBConnect;
+
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -57,10 +58,8 @@ public class ProductDAO {
             if (rs.next()) {
                 Product product = extractProductFull(rs);
                 
-                // Load images
+                // Load images & variants
                 product.setImages(getProductImages(id));
-                
-                // Load variants
                 product.setVariants(getProductVariants(id));
                 
                 return product;
@@ -84,20 +83,15 @@ public class ProductDAO {
         
         List<String> params = new ArrayList<>();
         
-        // Keyword search
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append(" AND (p.name LIKE ? OR p.brand LIKE ?)");
             params.add("%" + keyword + "%");
             params.add("%" + keyword + "%");
         }
-        
-        // Category filter
         if (category != null && !category.equals("0")) {
             sql.append(" AND p.category_id = ?");
             params.add(category);
         }
-        
-        // Price range
         if (minPrice != null && !minPrice.isEmpty()) {
             sql.append(" AND p.sale_price >= ?");
             params.add(minPrice);
@@ -106,8 +100,6 @@ public class ProductDAO {
             sql.append(" AND p.sale_price <= ?");
             params.add(maxPrice);
         }
-        
-        // Gender filter
         if (gender != null && !gender.equals("all")) {
             sql.append(" AND p.gender = ?");
             params.add(gender);
@@ -131,52 +123,133 @@ public class ProductDAO {
         }
         return products;
     }
-    
+
     // ========================================
-    // 4. ADMIN - CRUD
+    // 4. LỌC THEO DANH MỤC (Cha & Con)
     // ========================================
-    
-    // Thêm sản phẩm
-    public boolean addProduct(Product product) {
+
+    // Lấy sản phẩm theo Danh mục CHA (Bao gồm cả sản phẩm của danh mục con)
+    public List<Product> getProductsByCategory(int categoryId) {
+        List<Product> products = new ArrayList<>();
         String sql = """
-            INSERT INTO products (name, description, price, sale_price, stock, category_id, brand, 
-            gender, frame_material, lens_type, uv_protection, is_featured, image, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
+            SELECT p.*, c.name as category_name 
+            FROM products p 
+            LEFT JOIN categories c ON p.category_id = c.id 
+            WHERE (p.category_id = ? OR p.category_id IN (SELECT id FROM categories WHERE parent_id = ?)) 
+            AND p.status = 'active' 
+            ORDER BY p.created_at DESC
             """;
         
         try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) { // Sửa lại chỗ này cho an toàn
             
-            ps.setString(1, product.getName());
-            ps.setString(2, product.getDescription());
-            ps.setBigDecimal(3, product.getPrice());
-            ps.setBigDecimal(4, product.getSalePrice());
-            ps.setInt(5, product.getStock());
-            ps.setInt(6, product.getCategoryId());
-            ps.setString(7, product.getBrand());
-            ps.setString(8, product.getGender());
-            ps.setString(9, product.getFrameMaterial());
-            ps.setString(10, product.getLensType());
-            ps.setBoolean(11, product.isUvProtection());
-            ps.setBoolean(12, product.isIsFeatured());
-            ps.setString(13, product.getImage());
+            ps.setInt(1, categoryId); 
+            ps.setInt(2, categoryId); 
+            ResultSet rs = ps.executeQuery();
             
-            int rows = ps.executeUpdate();
-            if (rows > 0) {
-                ResultSet generatedKeys = ps.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int newId = generatedKeys.getInt(1);
-                    System.out.println("✅ Added product ID: " + newId);
-                    return true;
-                }
+            while (rs.next()) {
+                products.add(extractProductBasic(rs));
+            }
+            System.out.println("✅ Loaded " + products.size() + " products for parent category " + categoryId);
+            
+        } catch (SQLException e) {
+            System.err.println("❌ getProductsByCategory: " + e.getMessage());
+        }
+        return products;
+    }
+
+    // Lấy sản phẩm theo Danh mục CON (Chỉ lấy chính xác ID đó)
+    public List<Product> getProductsBySubCategory(int subCategoryId) {
+        List<Product> products = new ArrayList<>();
+        String sql = """
+            SELECT p.*, c.name as category_name 
+            FROM products p 
+            LEFT JOIN categories c ON p.category_id = c.id 
+            WHERE p.category_id = ? AND p.status = 'active' 
+            ORDER BY p.created_at DESC
+            """;
+        
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, subCategoryId);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                products.add(extractProductBasic(rs));
+            }
+            System.out.println("✅ Loaded " + products.size() + " products for sub-category " + subCategoryId);
+            
+        } catch (SQLException e) {
+            System.err.println("❌ getProductsBySubCategory: " + e.getMessage());
+        }
+        return products;
+    }
+    
+    // Sản phẩm nổi bật
+    public List<Product> getFeaturedProducts(int limit) {
+        List<Product> featured = new ArrayList<>();
+        // Cập nhật JOIN để đồng bộ với hàm extractProductBasic
+        String sql = """
+            SELECT p.*, c.name as category_name 
+            FROM products p 
+            LEFT JOIN categories c ON p.category_id = c.id 
+            WHERE p.is_featured = TRUE AND p.status = 'active' 
+            ORDER BY p.created_at DESC LIMIT ?
+            """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                featured.add(extractProductBasic(rs));
             }
         } catch (SQLException e) {
-            System.err.println("❌ addProduct: " + e.getMessage());
+            System.err.println("❌ getFeaturedProducts: " + e.getMessage());
+        }
+        return featured;
+    }
+    
+    // ========================================
+    // 5. ADMIN - CRUD
+    // ========================================
+    
+    public boolean addProduct(Product p) {
+        // Bổ sung gender, frame_material, lens_type vào SQL
+        String sql = "INSERT INTO products (name, brand, category_id, stock, price, sale_price, description, image, is_featured, uv_protection, status, gender, frame_material, lens_type) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, p.getName());
+            ps.setString(2, p.getBrand());
+            ps.setInt(3, p.getCategoryId());
+            ps.setInt(4, p.getStock());
+            ps.setBigDecimal(5, p.getPrice());
+            ps.setBigDecimal(6, p.getSalePrice());
+            ps.setString(7, p.getDescription());
+            ps.setString(8, p.getImage()); 
+            ps.setBoolean(9, p.isFeatured());
+            ps.setBoolean(10, p.isUvProtection());
+            ps.setString(11, "active"); // Mặc định khi thêm mới
+            
+            // Set thêm 3 tham số mới
+            ps.setString(12, p.getGender());
+            ps.setString(13, p.getFrameMaterial());
+            ps.setString(14, p.getLensType());
+            
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("✅ Đã thêm sản phẩm thành công vào DB!");
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi thêm sản phẩm: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
     
-    // Cập nhật sản phẩm
     public boolean updateProduct(Product product) {
         String sql = """
             UPDATE products SET name=?, description=?, price=?, sale_price=?, stock=?, 
@@ -198,7 +271,7 @@ public class ProductDAO {
             ps.setString(9, product.getFrameMaterial());
             ps.setString(10, product.getLensType());
             ps.setBoolean(11, product.isUvProtection());
-            ps.setBoolean(12, product.isIsFeatured());
+            ps.setBoolean(12, product.isFeatured());
             ps.setString(13, product.getImage());
             ps.setInt(14, product.getId());
             
@@ -211,7 +284,6 @@ public class ProductDAO {
         return false;
     }
     
-    // Xóa sản phẩm (Soft delete)
     public boolean deleteProduct(int id) {
         String sql = "UPDATE products SET status = 'inactive' WHERE id = ?";
         try (Connection conn = DBConnect.getConnection();
@@ -227,7 +299,7 @@ public class ProductDAO {
     }
     
     // ========================================
-    // 5. HELPER METHODS
+    // 6. HELPER METHODS
     // ========================================
     
     private Product extractProductBasic(ResultSet rs) throws SQLException {
@@ -240,9 +312,14 @@ public class ProductDAO {
         p.setStock(rs.getInt("stock"));
         p.setBrand(rs.getString("brand"));
         p.setImage(rs.getString("image"));
-        p.setIsFeatured(rs.getBoolean("is_featured"));
+        p.setFeatured(rs.getBoolean("is_featured"));
         p.setGender(rs.getString("gender"));
         p.setCategoryId(rs.getInt("category_id"));
+        p.setStatus(rs.getString("status")); // Nên lấy thêm status
+        
+        // MỞ COMMENT DÒNG NÀY ĐỂ HIỂN THỊ ĐƯỢC TÊN DANH MỤC TRÊN WEB
+        p.setCategoryName(rs.getString("category_name")); 
+        
         return p;
     }
     
@@ -254,7 +331,6 @@ public class ProductDAO {
         return p;
     }
     
-    // Lấy ảnh sản phẩm
     private List<ProductImage> getProductImages(int productId) {
         List<ProductImage> images = new ArrayList<>();
         String sql = "SELECT * FROM product_images WHERE product_id = ? ORDER BY is_main DESC";
@@ -270,12 +346,11 @@ public class ProductDAO {
                 images.add(img);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("❌ getProductImages: " + e.getMessage());
         }
         return images;
     }
     
-    // Lấy biến thể sản phẩm
     private List<ProductVariant> getProductVariants(int productId) {
         List<ProductVariant> variants = new ArrayList<>();
         String sql = "SELECT * FROM product_variants WHERE product_id = ?";
@@ -294,52 +369,8 @@ public class ProductDAO {
                 variants.add(v);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("❌ getProductVariants: " + e.getMessage());
         }
         return variants;
     }
-    // Thêm method này vào ProductDAO class
-public List<Product> getProductsByCategory(int categoryId) {
-    List<Product> products = new ArrayList<>();
-    String sql = """
-        SELECT p.*, c.name as category_name 
-        FROM products p 
-        LEFT JOIN categories c ON p.category_id = c.id 
-        WHERE p.category_id = ? AND p.status = 'active' 
-        ORDER BY p.created_at DESC
-        """;
-    
-    try (Connection conn = DBConnect.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, categoryId);
-        ResultSet rs = ps.executeQuery();
-        
-        while (rs.next()) {
-            products.add(extractProductBasic(rs));
-        }
-        System.out.println("✅ Loaded " + products.size() + " products for category " + categoryId);
-        
-    } catch (SQLException e) {
-        System.err.println("❌ getProductsByCategory: " + e.getMessage());
-    }
-    return products;
 }
-    // Sản phẩm nổi bật
-    public List<Product> getFeaturedProducts(int limit) {
-        List<Product> featured = new ArrayList<>();
-        String sql = "SELECT * FROM products WHERE is_featured = TRUE AND status = 'active' ORDER BY created_at DESC LIMIT ?";
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, limit);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                featured.add(extractProductBasic(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return featured;
-    }
-    
-}   

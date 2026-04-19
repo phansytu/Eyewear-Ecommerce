@@ -38,23 +38,13 @@ public class HomeServlet extends HttpServlet {
             request.setAttribute("categories", categories);
             
             // Forward to JSP
-            request.getRequestDispatcher("/jsp/public/home.jsp").forward(request, response);
+            request.getRequestDispatcher("/home.jsp").forward(request, response);
             
-        } catch (Exception e) {
-            // Log error
-            e.printStackTrace();
-            
-            // Safe error page
-            request.setAttribute("error", "Lỗi tải dữ liệu: " + e.getMessage());
-            request.setAttribute("errorCode", "HOME_001");
-            
-            // Fallback to simple error page
-            String errorPath = "/jsp/error.jsp";
-            try {
-                request.getRequestDispatcher(errorPath).forward(request, response);
-            } catch (Exception ex) {
-                ex.getMessage();
-            }
-        }
+        }  catch (Exception e) {
+    e.printStackTrace();
+    // Bỏ gọi file error.jsp đi, in thẳng lỗi ra màn hình để biết tại sao
+    response.setContentType("text/html; charset=UTF-8");
+    response.getWriter().write("<h1>Có lỗi khi lấy dữ liệu từ Database: " + e.getMessage() + "</h1>");
+}
     }
 }
