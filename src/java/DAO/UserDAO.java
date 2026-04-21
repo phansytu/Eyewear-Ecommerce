@@ -290,7 +290,7 @@ public class UserDAO {
         user.setUsername(rs.getString("username"));
         user.setPassword(rs.getString("password"));
         user.setEmail(rs.getString("email"));
-        user.setFull_name(rs.getString("fullname"));
+        user.setFull_name(rs.getString("full_name"));
         user.setRole(rs.getString("role"));
         user.setCreateAt(rs.getTimestamp("created_at"));
         user.setLoginAttempts(rs.getInt("login_attempts"));
