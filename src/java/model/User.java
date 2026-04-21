@@ -27,11 +27,15 @@ public class User {
     private String gender; // Nam, Nữ, Khác
     private String dob;    // Ngày sinh
     private String avatar; // Đường dẫn ảnh đại diện
+    private String address;
 
     public User() {
     }
 
-    public User(int id, String username, String email, String password, String role, Timestamp createAt, String phone, String full_name, int loginAttempts, Timestamp lockedUntil, String status, Timestamp lastLogin, String resetToken, Timestamp resetTokenExpiry, String gender, String dob, String avatar) {
+    public User(int id, String username, String email, String password, 
+            String role, Timestamp createAt, String phone, String full_name, 
+            int loginAttempts, Timestamp lockedUntil, String status, Timestamp lastLogin, 
+            String resetToken, Timestamp resetTokenExpiry, String gender, String dob, String avatar, String address) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -49,6 +53,7 @@ public class User {
         this.gender = gender;
         this.dob = dob;
         this.avatar = avatar;
+        this.address = address;
     }
 
     public String getGender() {
@@ -191,6 +196,15 @@ public class User {
     public void setResetTokenExpiry(Timestamp resetTokenExpiry) {
         this.resetTokenExpiry = resetTokenExpiry;
     }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
     public boolean isAdmin() {
         return "admin".equals(role);
     }

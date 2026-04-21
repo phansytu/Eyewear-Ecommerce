@@ -242,6 +242,56 @@ public class UserDAO {
             return false;
         }
     }
+    //cap nhat anh dai dien
+    public boolean updateAvatar(int userId, String avatarUrl) {
+        String sql = "UPDATE users SET avatar = ? WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, avatarUrl);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    /**
+     * Lấy danh sách tất cả users (cho admin)
+     * @return List<User>
+     */
+    public java.util.List<User> getAllUsers() {
+        java.util.List<User> users = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM users ORDER BY id DESC";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Cập nhật trạng thái user (active/inactive/banned)
+     * @param userId ID user
+     * @param status Trạng thái mới
+     * @return true nếu cập nhật thành công
+     */
+    public boolean updateUserStatus(int userId, String status) {
+        String sql = "UPDATE users SET status = ? WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     
     // Kiểm tra username tồn tại
     public boolean isUsernameExists(String username) {
@@ -283,29 +333,56 @@ public class UserDAO {
         }
         return false;
     }
-    // ==========================================
-    // PHẦN BỔ SUNG CHO TÍNH NĂNG PROFILE 
-    // ==========================================
-    
-    // Cập nhật thông tin hồ sơ (Không đổi pass/username)
-    public boolean updateProfile(User user) {
-        String sql = "UPDATE users SET full_name=?, email=?, phone=?, gender=?, dob=? WHERE id=?";
+    public boolean changePassword(int userId, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-             
-            ps.setString(1, user.getFull_name());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPhone());
-            ps.setString(4, user.getGender());
-            ps.setString(5, user.getDob());
-            ps.setInt(6, user.getId());
-            
+            ps.setString(1, hashPassword(newPassword));
+            ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+    public boolean checkCurrentPassword(int userId, String plainPassword) {
+        String sql = "SELECT password FROM users WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String hashedPassword = rs.getString("password");
+                return checkPassword(plainPassword, hashedPassword);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    // ==========================================
+    // PHẦN BỔ SUNG CHO TÍNH NĂNG PROFILE 
+    // ==========================================
+    
+    // Cập nhật thông tin hồ sơ (Không đổi pass/username)
+//    public boolean updateProfile(User user) {
+//        String sql = "UPDATE users SET full_name=?, email=?, phone=?, gender=?, dob=?,  WHERE id=?";
+//        try (Connection conn = DBConnect.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//             
+//            ps.setString(1, user.getFull_name());
+//            ps.setString(2, user.getEmail());
+//            ps.setString(3, user.getPhone());
+//            ps.setString(4, user.getGender());
+//            ps.setString(5, user.getDob());
+//            ps.setInt(6, user.getId());
+//            
+//            return ps.executeUpdate() > 0;
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id"));
@@ -334,4 +411,98 @@ public class UserDAO {
         
         return user;
     }
+    // PHẦN BỔ SUNG CHO TÍNH NĂNG PROFILE 
+    // ==========================================
+    
+    /**
+     * Cập nhật thông tin hồ sơ đầy đủ (bao gồm address)
+     * @param user User object chứa thông tin cần cập nhật
+     * @return true nếu cập nhật thành công
+     */
+    public boolean updateUserProfile(User user) {
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, gender = ?, dob = ?, address = ?, avatar = ? WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setString(1, user.getFull_name());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPhone());
+            ps.setString(4, user.getGender());
+            ps.setString(5, user.getDob());
+            ps.setString(6, user.getAddress());
+            ps.setString(7, user.getAvatar());
+            ps.setInt(8, user.getId());
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Cập nhật thông tin cơ bản (không bao gồm avatar)
+     * @param user User object
+     * @return true nếu cập nhật thành công
+     */
+    public boolean updateProfileBasic(User user) {
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone = ?, gender = ?, dob = ?, address = ? WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setString(1, user.getFull_name());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPhone());
+            ps.setString(4, user.getGender());
+            ps.setString(5, user.getDob());
+            ps.setString(6, user.getAddress());
+            ps.setInt(7, user.getId());
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    // Thêm vào UserDAO.java
+
+/**
+ * Lấy tổng số người dùng
+ * @return tổng số người dùng
+ */
+public int getTotalUsers() {
+    String sql = "SELECT COUNT(*) as total FROM users WHERE role = 'user'";
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        
+        if (rs.next()) {
+            return rs.getInt("total");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+/**
+ * Lấy số lượng người dùng mới trong tháng
+ * @return số lượng người dùng mới
+ */
+public int getNewUsersThisMonth() {
+    String sql = "SELECT COUNT(*) as total FROM users WHERE role = 'user' AND MONTH(created_at) = MONTH(NOW()) AND YEAR(created_at) = YEAR(NOW())";
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        
+        if (rs.next()) {
+            return rs.getInt("total");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
 }

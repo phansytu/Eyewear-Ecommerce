@@ -27,7 +27,7 @@ public class LoginServlet extends HttpServlet {
                 // Đã đồng nhất path admin
                 response.sendRedirect(request.getContextPath() + "/jsp/admin/dashboard.jsp");
             } else {
-                response.sendRedirect(request.getContextPath() + "/home");
+                response.sendRedirect(request.getContextPath() + "/profile.jsp");
             }
         } else {
             request.getRequestDispatcher("/login.jsp").forward(request, response);

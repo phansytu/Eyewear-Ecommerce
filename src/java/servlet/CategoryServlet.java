@@ -59,7 +59,7 @@ public class CategoryServlet extends HttpServlet {
                 if (subIdStr != null && !subIdStr.isEmpty()) {
                     // Trạng thái 1: User click vào một Danh mục Con cụ thể
                     int subCategoryId = Integer.parseInt(subIdStr);
-                    productList = productDAO.getProductsBySubCategory(subCategoryId);
+                    productList = productDAO.getProductsByCategory (subCategoryId);
                 } else {
                     // Trạng thái 2: User chỉ click vào Danh mục Cha (mặc định xem tất cả)
                     productList = productDAO.getProductsByCategory(categoryId);
