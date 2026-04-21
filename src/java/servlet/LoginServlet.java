@@ -24,9 +24,10 @@ public class LoginServlet extends HttpServlet {
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
             if (user.isAdmin()) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard.jsp");
+                // Đã đồng nhất path admin
+                response.sendRedirect(request.getContextPath() + "/jsp/admin/dashboard.jsp");
             } else {
-                response.sendRedirect(request.getContextPath() + "/user/dashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/home");
             }
         } else {
             request.getRequestDispatcher("/login.jsp").forward(request, response);
@@ -36,6 +37,9 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
+        
+        // SỬA: Thêm UTF-8 để nhận và trả JSON tiếng Việt không bị lỗi font (???)
+        request.setCharacterEncoding("UTF-8");
         
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -49,7 +53,8 @@ public class LoginServlet extends HttpServlet {
             password == null || password.trim().isEmpty()) {
             
             if (isAjax) {
-                response.setContentType("application/json");
+                // SỬA: Đảm bảo Response JSON có mã hóa UTF-8
+                response.setContentType("application/json; charset=UTF-8"); 
                 Map<String, Object> jsonResponse = new HashMap<>();
                 jsonResponse.put("success", false);
                 jsonResponse.put("message", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
@@ -72,26 +77,28 @@ public class LoginServlet extends HttpServlet {
             session.setMaxInactiveInterval(30 * 60);
             
             if (isAjax) {
-                response.setContentType("application/json");
+                response.setContentType("application/json; charset=UTF-8");
                 Map<String, Object> jsonResponse = new HashMap<>();
                 jsonResponse.put("success", true);
                 jsonResponse.put("role", user.getRole());
-                jsonResponse.put("redirect", user.isAdmin() ? 
-                    request.getContextPath() + "/admin/dashboard.jsp" : 
-                    request.getContextPath() + "/user/dashboard.jsp");
+                
+                // SỬA: Đồng nhất đường dẫn chuyển hướng Admin
+                // Ép tất cả đều về trang chủ
+jsonResponse.put("redirect", request.getContextPath() + "/home");
+                
                 response.getWriter().write(new Gson().toJson(jsonResponse));
             } else {
                 if (user.isAdmin()) {
-                    response.sendRedirect(request.getContextPath() + "/admin/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/jsp/admin/dashboard.jsp");
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/user/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/home");
                 }
             }
         } else {
             User lockedUser = userDAO.getUserByUsername(username);
             
             if (isAjax) {
-                response.setContentType("application/json");
+                response.setContentType("application/json; charset=UTF-8");
                 Map<String, Object> jsonResponse = new HashMap<>();
                 jsonResponse.put("success", false);
                 

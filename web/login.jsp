@@ -112,113 +112,69 @@
     </div>
     
     <script>
-        let currentUserId = null;
-        const modal = document.getElementById('unlockModal');
-        const errorDiv = document.getElementById('errorMsg');
+    let currentUserId = null;
+    const modal = document.getElementById('unlockModal');
+    const errorDiv = document.getElementById('errorMsg');
+    
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Ngăn form reload lại trang
+        hideError();
+
+        const formData = new URLSearchParams(new FormData(this));
+        const btn = document.querySelector(".btn-login");
+        const originalText = btn.innerHTML;
         
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideError();
-            
-            const formData = new URLSearchParams();
-            formData.append('username', document.getElementById('username').value);
-            formData.append('password', document.getElementById('password').value);
-            
-            try {
-                // Mã mới đã fix
-const response = await fetch('${pageContext.request.contextPath}/login', {
-    method: 'POST',
-    headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Requested-With': 'XMLHttpRequest'  // <-- THÊM DÒNG NÀY ĐỂ SERVLET NHẬN DIỆN LÀ AJAX
-    },
-    body: formData
-});
-                const data = await response.json();
-                
-                if (data.success) {
-                    window.location.href = data.redirect;
-                } else if (data.locked) {
+        // Đổi trạng thái nút thành loading
+        btn.innerHTML = 'Đang xử lý...';
+        btn.disabled = true;
+
+        fetch('${pageContext.request.contextPath}/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest' 
+            },
+            body: formData.toString()
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Thành công: Chuyển hướng theo JSON trả về
+                window.location.href = data.redirect;
+            } else {
+                // Thất bại
+                if (data.locked) {
                     showError(data.message);
                     modal.style.display = 'block';
                 } else {
                     showError(data.message);
                 }
-            } catch (error) {
-                showError('Có lỗi xảy ra, vui lòng thử lại!');
+                // Trả lại trạng thái ban đầu cho nút bấm
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Lỗi kết nối tới máy chủ!');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         });
-        
-        function sendOTP() {
-            const email = document.getElementById('unlockEmail').value;
-            if (!email) {
-                alert('Vui lòng nhập email!');
-                return;
-            }
-            
-            showLoading();
-            fetch('${pageContext.request.contextPath}/unlock-account', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ action: 'send-otp', email: email })
-            })
-            .then(res => res.json())
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    currentUserId = data.userId;
-                    document.getElementById('step1').style.display = 'none';
-                    document.getElementById('step2').style.display = 'block';
-                    alert(data.message);
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(() => { hideLoading(); alert('Có lỗi xảy ra!'); });
-        }
-        
-        function verifyOTP() {
-            const otp = document.getElementById('otpCode').value;
-            if (!otp || otp.length !== 6) {
-                alert('Vui lòng nhập đầy đủ 6 số OTP!');
-                return;
-            }
-            
-            showLoading();
-            fetch('${pageContext.request.contextPath}/unlock-account', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ action: 'verify-otp', userId: currentUserId, otp: otp })
-            })
-            .then(res => res.json())
-            .then(data => {
-                hideLoading();
-                if (data.success) {
-                    alert(data.message);
-                    modal.style.display = 'none';
-                    document.getElementById('step1').style.display = 'block';
-                    document.getElementById('step2').style.display = 'none';
-                    document.getElementById('unlockEmail').value = '';
-                    document.getElementById('otpCode').value = '';
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(() => { hideLoading(); alert('Có lỗi xảy ra!'); });
-        }
-        
-        function showError(msg) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-            setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
-        }
-        
-        function hideError() { errorDiv.style.display = 'none'; }
-        function showLoading() { document.getElementById('loading').style.display = 'block'; }
-        function hideLoading() { document.getElementById('loading').style.display = 'none'; }
-        
-        document.querySelector('.close').onclick = () => { modal.style.display = 'none'; };
-        window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
-    </script>
+    });
+    
+    // ... (Giữ nguyên các hàm sendOTP, verifyOTP, showError, hideError, showLoading, hideLoading của bạn ở đây) ...
+
+    function showError(msg) {
+        errorDiv.textContent = msg;
+        errorDiv.style.display = 'block';
+        setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
+    }
+    function hideError() { errorDiv.style.display = 'none'; }
+    function showLoading() { document.getElementById('loading').style.display = 'block'; }
+    function hideLoading() { document.getElementById('loading').style.display = 'none'; }
+    
+    document.querySelector('.close').onclick = () => { modal.style.display = 'none'; };
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
+</script>
 </body>
 </html>

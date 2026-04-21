@@ -283,7 +283,29 @@ public class UserDAO {
         }
         return false;
     }
+    // ==========================================
+    // PHẦN BỔ SUNG CHO TÍNH NĂNG PROFILE 
+    // ==========================================
     
+    // Cập nhật thông tin hồ sơ (Không đổi pass/username)
+    public boolean updateProfile(User user) {
+        String sql = "UPDATE users SET full_name=?, email=?, phone=?, gender=?, dob=? WHERE id=?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setString(1, user.getFull_name());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPhone());
+            ps.setString(4, user.getGender());
+            ps.setString(5, user.getDob());
+            ps.setInt(6, user.getId());
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id"));
@@ -299,6 +321,17 @@ public class UserDAO {
         user.setLastLogin(rs.getTimestamp("last_login"));
         user.setResetToken(rs.getString("reset_token"));
         user.setResetTokenExpiry(rs.getTimestamp("reset_token_expiry"));
+        
+        // BỔ SUNG 3 DÒNG NÀY (Thêm try-catch nhỏ để tránh lỗi nếu DB chưa có cột này)
+        try {
+            user.setPhone(rs.getString("phone"));
+            user.setGender(rs.getString("gender"));
+            user.setDob(rs.getString("dob"));
+            user.setAvatar(rs.getString("avatar"));
+        } catch (SQLException e) {
+            // Bỏ qua nếu các cột này chưa được tạo trong Database
+        }
+        
         return user;
     }
 }

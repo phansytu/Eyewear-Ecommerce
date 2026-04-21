@@ -24,11 +24,14 @@ public class User {
     private Timestamp lastLogin;
      private String resetToken;
     private Timestamp resetTokenExpiry;
+    private String gender; // Nam, Nữ, Khác
+    private String dob;    // Ngày sinh
+    private String avatar; // Đường dẫn ảnh đại diện
 
     public User() {
     }
 
-    public User(int id, String username, String email, String password, String role, Timestamp createAt, String phone, String full_name, int loginAttempts, Timestamp lockedUntil, String status, Timestamp lastLogin, String resetToken, Timestamp resetTokenExpiry) {
+    public User(int id, String username, String email, String password, String role, Timestamp createAt, String phone, String full_name, int loginAttempts, Timestamp lockedUntil, String status, Timestamp lastLogin, String resetToken, Timestamp resetTokenExpiry, String gender, String dob, String avatar) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -43,7 +46,38 @@ public class User {
         this.lastLogin = lastLogin;
         this.resetToken = resetToken;
         this.resetTokenExpiry = resetTokenExpiry;
+        this.gender = gender;
+        this.dob = dob;
+        this.avatar = avatar;
     }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+    
+
+    
+    
 
     public int getLoginAttempts() {
         return loginAttempts;

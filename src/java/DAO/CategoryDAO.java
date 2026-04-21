@@ -1,7 +1,6 @@
 package DAO;
 
 import model.Category;
-import model.Product;
 import util.DBConnect;
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,23 +9,24 @@ import java.util.List;
 public class CategoryDAO {
     
     // ========================================
-    // 1. TẤT CẢ DANH MỤC (Tree structure)
+    // 1. LẤY TẤT CẢ DANH MỤC (Phục vụ Header / Menu)
     // ========================================
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM categories ORDER BY parent_id, name";
+        // Chỉ lấy các danh mục CHA (parent_id IS NULL hoặc = 0) để hiển thị trên thanh menu chính
+        String sql = "SELECT * FROM categories WHERE parent_id IS NULL OR parent_id = 0 ORDER BY id";
         
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             
             while (rs.next()) {
-                categories.add(extractCategory(rs));
+                Category cat = extractCategory(rs);
+                // Lấy luôn danh sách danh mục con gán vào danh mục cha này
+                cat.setSubCategories(getSubCategoriesByParentId(cat.getId()));
+                categories.add(cat);
             }
-            
-            // Build tree structure
-            buildCategoryTree(categories);
-            System.out.println("✅ Loaded " + categories.size() + " categories");
+            System.out.println("✅ Loaded " + categories.size() + " parent categories with their tree");
             
         } catch (SQLException e) {
             System.err.println("❌ getAllCategories: " + e.getMessage());
@@ -35,9 +35,10 @@ public class CategoryDAO {
     }
     
     // ========================================
-    // 2. DANH MỤC THEO PARENT ID
+    // 2. LẤY DANH MỤC CON THEO ID CHA (Phục vụ Sidebar JSP)
     // ========================================
-    public List<Category> getCategoriesByParent(int parentId) {
+    // Đã đổi tên hàm khớp với CategoryServlet: getSubCategoriesByParentId
+    public List<Category> getSubCategoriesByParentId(int parentId) {
         List<Category> subCats = new ArrayList<>();
         String sql = "SELECT * FROM categories WHERE parent_id = ? ORDER BY name";
         
@@ -50,14 +51,30 @@ public class CategoryDAO {
                 subCats.add(extractCategory(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("❌ getSubCategoriesByParentId: " + e.getMessage());
         }
         return subCats;
     }
     
     // ========================================
-    // 3. DANH MỤC + SẢN PHẨM CON
+    // 3. CHI TIẾT 1 DANH MỤC
     // ========================================
+    public Category getCategoryById(int id) {
+        String sql = "SELECT * FROM categories WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return extractCategory(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ getCategoryById: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // Tiện ích: Lấy danh mục kèm luôn danh sách sản phẩm (Dành cho các logic đặc thù khác)
     public Category getCategoryWithProducts(int categoryId) {
         Category category = getCategoryById(categoryId);
         if (category != null) {
@@ -68,10 +85,11 @@ public class CategoryDAO {
     }
     
     // ========================================
-    // 4. ADMIN CRUD
+    // 4. ADMIN CRUD (Thêm, Sửa, Xóa)
     // ========================================
     
     public boolean addCategory(Category category) {
+        // Hỗ trợ trường hợp parent_id có thể NULL (Danh mục cha)
         String sql = "INSERT INTO categories (name, description, image, parent_id) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -79,7 +97,12 @@ public class CategoryDAO {
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
             ps.setString(3, category.getImage());
-            ps.setInt(4, category.getParentId());
+            
+            if (category.getParentId() > 0) {
+                ps.setInt(4, category.getParentId());
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
             
             int rows = ps.executeUpdate();
             if (rows > 0) {
@@ -104,7 +127,13 @@ public class CategoryDAO {
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
             ps.setString(3, category.getImage());
-            ps.setInt(4, category.getParentId());
+            
+            if (category.getParentId() > 0) {
+                ps.setInt(4, category.getParentId());
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
+            
             ps.setInt(5, category.getId());
             
             int rows = ps.executeUpdate();
@@ -117,6 +146,8 @@ public class CategoryDAO {
     }
     
     public boolean deleteCategory(int id) {
+        // Lưu ý: Nếu xóa danh mục cha, cần quyết định xử lý danh mục con (xóa theo hoặc set parent_id = null)
+        // Ở đây mặc định chạy lệnh DELETE cơ bản. Hãy setup ON DELETE CASCADE trong DB nếu muốn tự động xóa con.
         String sql = "DELETE FROM categories WHERE id = ?";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -140,41 +171,8 @@ public class CategoryDAO {
         cat.setName(rs.getString("name"));
         cat.setDescription(rs.getString("description"));
         cat.setImage(rs.getString("image"));
-        cat.setParentId(rs.getInt("parent_id"));
+        // Nếu DB trả về NULL cho INT, rs.getInt() sẽ trả về 0. Điều này hoàn toàn hợp lý.
+        cat.setParentId(rs.getInt("parent_id")); 
         return cat;
-    }
-    
-    private Category getCategoryById(int id) {
-        String sql = "SELECT * FROM categories WHERE id = ?";
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return extractCategory(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    // Build hierarchical tree
-    private void buildCategoryTree(List<Category> categories) {
-        for (Category cat : categories) {
-            if (cat.isParent()) {
-                cat.setSubCategories(getSubCategories(cat.getId(), categories));
-            }
-        }
-    }
-    
-    private List<Category> getSubCategories(int parentId, List<Category> allCats) {
-        List<Category> subs = new ArrayList<>();
-        for (Category cat : allCats) {
-            if (cat.getParentId() == parentId) {
-                subs.add(cat);
-            }
-        }
-        return subs;
     }
 }
