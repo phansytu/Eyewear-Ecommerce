@@ -3,18 +3,19 @@ package util;
 import java.security.SecureRandom;
 
 public class OTPUtil {
-    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final SecureRandom random = new SecureRandom();
     
-    // Tạo OTP 6 số
-    public static String generateOTP() {
-        int otp = 100000 + secureRandom.nextInt(900000);
-        return String.valueOf(otp);
+    public static String generateOTP(int length) {
+        StringBuilder otp = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            otp.append(random.nextInt(10));
+        }
+        return otp.toString();
     }
     
-    // Tạo token ngẫu nhiên
     public static String generateToken() {
         byte[] bytes = new byte[32];
-        secureRandom.nextBytes(bytes);
+        random.nextBytes(bytes);
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b));

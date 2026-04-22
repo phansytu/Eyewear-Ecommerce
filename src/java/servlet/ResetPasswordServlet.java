@@ -1,7 +1,6 @@
 package servlet;
 
 import DAO.UserDAO;
-import model.User;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,34 +11,53 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/reset-password")
+@WebServlet(name = "ResetPasswordServlet", urlPatterns = {"/reset-password"})
 public class ResetPasswordServlet extends HttpServlet {
     private UserDAO userDAO = new UserDAO();
-    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
-    
+    private static final Pattern PASSWORD_PATTERN = 
+            Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("resetUserId");
+        Boolean otpVerified = (Boolean) session.getAttribute("otpVerified");
         
-        String token = request.getParameter("token");
-        String newPassword = request.getParameter("newPassword");
-        String confirmPassword = request.getParameter("confirmPassword");
+        if (userId == null || otpVerified == null || !otpVerified) {
+            response.sendRedirect("forgot-password");
+            return;
+        }
+        
+        request.getRequestDispatcher("/resetpassword.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("resetUserId");
+        Boolean otpVerified = (Boolean) session.getAttribute("otpVerified");
         
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         Map<String, Object> jsonResponse = new HashMap<>();
         
-        // Validate token
-        User user = userDAO.validateResetToken(token);
-        if (user == null) {
+        // Kiểm tra quyền truy cập
+        if (userId == null || otpVerified == null || !otpVerified) {
             jsonResponse.put("success", false);
-            jsonResponse.put("message", "Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn!");
+            jsonResponse.put("message", "Phiên làm việc đã hết hạn!");
             response.getWriter().write(new Gson().toJson(jsonResponse));
             return;
         }
         
-        // Validate password
-        if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+        String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmPassword");
+        
+        // Validate mật khẩu
+        if (newPassword == null || !PASSWORD_PATTERN.matcher(newPassword).matches()) {
             jsonResponse.put("success", false);
             jsonResponse.put("message", "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt!");
             response.getWriter().write(new Gson().toJson(jsonResponse));
@@ -53,12 +71,18 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
         
-        if (userDAO.updatePassword(user.getId(), newPassword)) {
+        // Cập nhật mật khẩu
+        if (userDAO.updatePassword(userId, newPassword)) {
+            // Xóa session
+            session.removeAttribute("resetUserId");
+            session.removeAttribute("resetEmail");
+            session.removeAttribute("otpVerified");
+            
             jsonResponse.put("success", true);
-            jsonResponse.put("message", "Đặt lại mật khẩu thành công! Vui lòng đăng nhập.");
+            jsonResponse.put("message", "Đặt lại mật khẩu thành công! Đang chuyển đến trang đăng nhập...");
         } else {
             jsonResponse.put("success", false);
-            jsonResponse.put("message", "Đặt lại mật khẩu thất bại, vui lòng thử lại!");
+            jsonResponse.put("message", "Có lỗi xảy ra, vui lòng thử lại!");
         }
         
         response.getWriter().write(new Gson().toJson(jsonResponse));
