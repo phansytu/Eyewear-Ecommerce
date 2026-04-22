@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
@@ -8,250 +9,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuKhanhHuy x Kính Mắt - Kính râm, gọng kính chính hãng</title>
+    <title>TuKhanhHuy - Kính mắt chính hãng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body { background-color: #f5f5fa; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        .text-tiki { color: #1A94FF; }
-        
-        /* Header */
-        .tiki-header { background-color: #fff; border-bottom: 1px solid #e1e1e1; padding-bottom: 8px;}
-        .top-promo { background-color: #f2fdf6; color: #00ab56; font-size: 13px; font-weight: 500; }
-        .logo-text { color: #1A94FF; font-weight: 800; font-size: 32px; letter-spacing: -1px; line-height: 1; }
-        .logo-sub { color: #1A94FF; font-size: 12px; font-weight: 600; }
-        .search-box { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
-        .search-box input { border: none; box-shadow: none !important; font-size: 14px; }
-        .search-btn { border-left: 1px solid #ddd; color: #1A94FF; font-weight: 500; border-radius: 0; width: 100px; }
-        .search-btn:hover { background-color: #f5f5f5; }
-        .search-tags a { color: #808089; font-size: 12px; text-decoration: none; margin-right: 10px; }
-        .header-action { color: #808089; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 6px; padding: 8px; border-radius: 8px;}
-        .header-action:hover { background-color: #f5f5fa; }
-        
-        /* Cam kết */
-        .commitment-bar { font-size: 12px; color: #808089; border-top: 1px solid #f0f0f0; padding-top: 8px; margin-top: 8px; }
-        
-        /* Menu Sidebar */
-        .sidebar-menu { border-radius: 8px; }
-        .hover-bg-light:hover { background-color: #f5f5fa; }
-        .hover-text-primary:hover { color: #1A94FF !important; }
-        
-        /* Banners & Quick Links */
-        .banner-img { width: 100%; border-radius: 8px; object-fit: cover; height: 100%; transition: opacity 0.2s;}
-        .banner-img:hover { opacity: 0.9; }
-        .quick-link-item { text-align: center; width: 85px; text-decoration: none; color: #38383d; }
-        .quick-link-item span { font-size: 12px; display: block; line-height: 1.4; margin-top: 4px;}
-        .icon-circle { width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 20px; transition: transform 0.2s;}
-        .quick-link-item:hover .icon-circle { transform: translateY(-3px); }
-        .bg-1 { background: #FDE8E8; color: #E02424; }
-        .bg-2 { background: #E1EFFE; color: #1C64F2; }
-        .bg-3 { background: #FDF6B2; color: #C27803; }
-        .bg-4 { background: #DEF7EC; color: #03543F; }
-        .bg-5 { background: #E5EDFF; color: #3F83F8; }
-        .bg-6 { background: #FCE8F3; color: #C81E1E; }
-
-        /* Floating Widget */
-        .floating-widget { position: fixed; right: 20px; bottom: 80px; background: #1A94FF; border-radius: 24px; padding: 10px 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;}
-        .floating-btn { width: 48px; height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 10px; margin: 4px 0;}
-        .floating-btn i { font-size: 20px; margin-bottom: 2px; }
-
-        /* Product Card */
-        .product-card { border: 1px solid transparent; border-radius: 8px; transition: box-shadow 0.2s; }
-        .product-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: #ddd;}
-    </style>
+    <link rel="stylesheet" href="css/style.css">
+    
 </head>
 <body>
 
-    <header class="tiki-header position-sticky top-0 z-3">
-        <div class="top-promo text-center py-2">
-            Tặng kèm hộp bảo vệ & khăn lau Nano cao cấp. Miễn phí vận chuyển đơn từ <strong>150.000đ</strong>
-        </div>
-
-        <div class="container-fluid px-4 pt-3">
-            <div class="row align-items-start">
-                <div class="col-lg-2 col-md-3">
-                    <a href="${root}/home" class="text-decoration-none d-inline-block">
-                        <div class="logo-text d-flex align-items-center">
-                            <i class="fas fa-glasses me-2" style="font-size: 26px;"></i>TuKhanhHuy
-                        </div>
-                        <div class="logo-sub text-center">Tốt & Thời Trang</div>
-                    </a>
-                </div>
-                
-                <div class="col-lg-7 col-md-6">
+<!-- Header -->
+<div class="main-header">
+    <div class="container-fluid px-4">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <a href="${root}/home" class="logo">
+                    TuKhanhHuy
+                    <span>Kính mắt chính hãng</span>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <div class="search-wrapper">
                     <form action="${root}/search" method="GET">
-                        <div class="search-box d-flex bg-white">
-                            <span class="ps-3 pe-2 d-flex align-items-center text-muted"><i class="fas fa-search"></i></span>
-                            <input type="text" name="keyword" class="form-control py-2" placeholder="Tìm gọng kính titanium, kính râm RayBan..." value="<c:out value='${param.keyword}'/>">
-                            <button class="btn search-btn px-4" type="submit">Tìm kiếm</button>
+                        <div class="search-box">
+                            <input type="text" name="keyword" placeholder="Bạn tìm gì hôm nay?" value="<c:out value='${param.keyword}'/>">
+                            <button type="submit">Tìm kiếm</button>
                         </div>
                     </form>
-                    <div class="search-tags mt-2">
-    <a href="${root}/category?id=18">gọng kính thời trang</a>
-    <a href="${root}/category?id=19">kính râm / kính mát</a>
-    <a href="${root}/category?id=20">kính chống ánh sáng xanh</a>
-    <a href="${root}/category?id=21">tròng kính</a>
-    <a href="${root}/category?id=22">kính áp tròng</a>
-    <a href="${root}/category?id=23">phụ kiện kính</a>
-</div>
-                </div>
-                
-                <div class="col-lg-3 col-md-3">
-                    <div class="d-flex justify-content-end align-items-center gap-2">
-                        <a href="${root}/home" class="header-action"><i class="fas fa-home fs-5 text-tiki"></i> Trang chủ</a>
-                        <a href="${root}/login" class="header-action"><i class="far fa-smile fs-5"></i> Tài khoản</a>
-                        <div class="vr mx-1 text-muted" style="height: 24px; opacity: 0.2;"></div>
-                        <a href="${root}/cart" class="header-action position-relative">
-                            <i class="fas fa-shopping-cart text-tiki fs-5"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="margin-left:-10px; font-size:10px;">0</span>
-                        </a>
-                    </div>
-                    <div class="text-end mt-2">
-                        <span class="text-muted" style="font-size: 13px;"><i class="fas fa-map-marker-alt me-1"></i>Giao đến:</span>
-                        <span class="fw-medium" style="font-size: 13px;">Q. 1, P. Bến Nghé, Hồ Chí Minh</span>
-                    </div>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <div class="commitment-bar d-flex flex-wrap align-items-center gap-3">
-                        <span class="fw-bold text-dark">Cam kết của shop</span>
-                        <span><i class="fas fa-check-circle text-primary"></i> 100% Kính chính hãng</span>
-                        <span><i class="fas fa-tools text-primary"></i> Bảo hành gọng 12 tháng</span>
-                        <span><i class="fas fa-eye text-primary"></i> Đo mắt & Tư vấn miễn phí</span>
-                        <span><i class="fas fa-shipping-fast text-primary"></i> Giao siêu tốc 2h</span>
-                    </div>
+            <div class="col-md-3">
+                <div class="header-actions">
+                    <a href="${root}/home" class="header-action">
+                        <i class="fas fa-home"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.user}">
+                            <div class="dropdown">
+                                <a href="#" class="header-action" data-bs-toggle="dropdown">
+                                    <i class="far fa-user-circle"></i>
+                                    <span>${fn:substring(sessionScope.user.full_name, 0, 10)}</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="${root}/profile">Hồ sơ của tôi</a></li>
+                                    <c:if test="${sessionScope.user.role eq 'admin'}">
+                                        <li><a class="dropdown-item" href="${root}/admin/dashboard">Quản trị</a></li>
+                                    </c:if>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="${root}/logout">Đăng xuất</a></li>
+                                </ul>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${root}/login" class="header-action">
+                                <i class="far fa-smile"></i>
+                                <span>Đăng nhập</span>
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
+                    <a href="${root}/cart" class="header-action position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Giỏ hàng</span>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">0</span>
+                    </a>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
+</div>
 
-    <main class="container-fluid px-4 py-4">
-        <div class="row g-3">
-            
-            <div class="col-xl-2 col-lg-3 d-none d-lg-block">
-                <div class="sidebar-menu bg-white p-3 shadow-sm sticky-top" style="top: 80px; z-index: 1;">
-                    <h6 class="fw-bold text-dark mb-3">Danh mục Kính</h6>
-                    <div class="nav flex-column">
-                        <c:forEach var="cat" items="${categories}">
-                            <c:if test="${cat.parent}">
-                                <div class="menu-parent mb-1">
-                                    <a href="${root}/category?id=${cat.id}" class="d-flex align-items-center py-2 px-2 text-dark text-decoration-none rounded hover-bg-light fw-medium">
-                                        <img src="${root}/${cat.image}" onerror="this.onerror=null; this.src='https://salt.tikicdn.com/cache/100x100/ts/category/13/64/43/226301adcc7660ffcf44a61bb6df99b7.png'" alt="icon" class="me-3" style="width: 24px; height: 24px; object-fit: cover;">
-                                        <span style="font-size: 13px;"><c:out value="${cat.name}"/></span>
-                                    </a>
-                                </div>
-                            </c:if>
-                        </c:forEach>
-                        <c:if test="${empty categories}">
-                            <p class="text-muted small mt-2">Chưa có danh mục nào.</p>
-                        </c:if>
+<!-- Navbar Menu -->
+<div class="navbar-menu">
+    <div class="container-fluid px-4">
+        <ul class="navbar-list">
+            <li><a href="${root}/home">Trang chủ</a></li>
+            <li><a href="${root}/search?categoryId=18">Gọng kính</a></li>
+            <li><a href="${root}/search?categoryId=19">Kính râm</a></li>
+            <li><a href="${root}/search?categoryId=20">Kính chống ánh sáng xanh</a></li>
+            <li><a href="${root}/search?categoryId=21">Tròng kính</a></li>
+            <li><a href="${root}/search?categoryId=22">Kính áp tròng</a></li>
+            <li><a href="${root}/search?categoryId=23">Phụ kiện</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="container-fluid px-4 py-4">
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-area">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${root}/home"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+                <c:if test="${not empty param.categoryId}">
+                    <c:choose>
+                        <c:when test="${param.categoryId == 18}">
+                            <li class="breadcrumb-item active">Gọng kính</li>
+                        </c:when>
+                        <c:when test="${param.categoryId == 19}">
+                            <li class="breadcrumb-item active">Kính râm</li>
+                        </c:when>
+                        <c:when test="${param.categoryId == 20}">
+                            <li class="breadcrumb-item active">Kính chống ánh sáng xanh</li>
+                        </c:when>
+                        <c:when test="${param.categoryId == 21}">
+                            <li class="breadcrumb-item active">Tròng kính</li>
+                        </c:when>
+                        <c:when test="${param.categoryId == 22}">
+                            <li class="breadcrumb-item active">Kính áp tròng</li>
+                        </c:when>
+                        <c:when test="${param.categoryId == 23}">
+                            <li class="breadcrumb-item active">Phụ kiện</li>
+                        </c:when>
+                        <c:otherwise>
+                            <li class="breadcrumb-item active">Danh mục sản phẩm</li>
+                        </c:otherwise>
+                    </c:choose>
+                </c:if>
+                <c:if test="${not empty param.gender}">
+                    <li class="breadcrumb-item active">
+                        <c:choose>
+                            <c:when test="${param.gender == 'Nam'}">Kính nam</c:when>
+                            <c:when test="${param.gender == 'Nữ'}">Kính nữ</c:when>
+                            <c:when test="${param.gender == 'Unisex'}">Kính Unisex</c:when>
+                        </c:choose>
+                    </li>
+                </c:if>
+                <c:if test="${not empty param.minPrice or not empty param.maxPrice}">
+                    <li class="breadcrumb-item active">
+                        Giá 
+                        <c:if test="${not empty param.minPrice}">từ ${param.minPrice}đ</c:if>
+                        <c:if test="${not empty param.maxPrice}">đến ${param.maxPrice}đ</c:if>
+                    </li>
+                </c:if>
+                <c:if test="${empty param.categoryId and empty param.gender and empty param.minPrice and empty param.maxPrice}">
+                    <li class="breadcrumb-item active">Tất cả sản phẩm</li>
+                </c:if>
+            </ol>
+        </nav>
+    </div>
+    
+    <!-- Banner -->
+    <div class="hero-banner">
+        <div class="banner-grid">
+            <div class="banner-card">
+                <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&h=400&q=80" alt="Banner chính">
+            </div>
+            <div class="banner-card">
+                <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=600&h=400&q=80" alt="Banner phụ">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Row -->
+    <div class="row g-4">
+        <!-- Sidebar Filter -->
+        <div class="col-lg-3">
+            <div class="filter-sidebar">
+                <h3 class="filter-title">Bộ lọc sản phẩm</h3>
+                
+                <form id="filterForm" method="GET" action="${root}/home">
+                    <!-- Giá -->
+                    <div class="filter-group">
+                        <label class="filter-label">💰 Giá</label>
+                        <div class="price-inputs">
+                            <input type="number" name="minPrice" placeholder="Từ" value="${param.minPrice}">
+                            <input type="number" name="maxPrice" placeholder="Đến" value="${param.maxPrice}">
+                        </div>
                     </div>
+                    
+                    <!-- Giới tính -->
+                    <div class="filter-group">
+                        <label class="filter-label">👤 Giới tính</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="" ${empty param.gender ? 'checked' : ''}>
+                                <span>Tất cả</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="Nam" ${param.gender == 'Nam' ? 'checked' : ''}>
+                                <span><i class="fas fa-mars me-1"></i>Nam</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="Nữ" ${param.gender == 'Nữ' ? 'checked' : ''}>
+                                <span><i class="fas fa-venus me-1"></i>Nữ</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="Unisex" ${param.gender == 'Unisex' ? 'checked' : ''}>
+                                <span><i class="fas fa-genderless me-1"></i>Unisex</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Chất liệu -->
+                    <div class="filter-group">
+                        <label class="filter-label">🔧 Chất liệu</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="" ${empty param.frameMaterial ? 'checked' : ''}>
+                                <span>Tất cả</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Titanium" ${param.frameMaterial == 'Titanium' ? 'checked' : ''}>
+                                <span>Titanium</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Acetate" ${param.frameMaterial == 'Acetate' ? 'checked' : ''}>
+                                <span>Acetate</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Metal" ${param.frameMaterial == 'Metal' ? 'checked' : ''}>
+                                <span>Metal</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Plastic" ${param.frameMaterial == 'Plastic' ? 'checked' : ''}>
+                                <span>Plastic</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="TR90" ${param.frameMaterial == 'TR90' ? 'checked' : ''}>
+                                <span>TR90</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="sort" id="sortInput" value="${param.sort != null ? param.sort : 'newest'}">
+                    <button type="submit" class="filter-btn"><i class="fas fa-filter me-2"></i>Áp dụng bộ lọc</button>
+                    
+                    <c:if test="${not empty param.minPrice or not empty param.maxPrice or not empty param.gender or not empty param.frameMaterial}">
+                        <a href="${root}/home" class="btn btn-link text-danger mt-2 w-100 text-decoration-none">
+                            <i class="fas fa-times-circle me-1"></i>Xóa tất cả bộ lọc
+                        </a>
+                    </c:if>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Product Section -->
+        <div class="col-lg-9">
+            <div class="section-header">
+                <h2 class="section-title">Tất cả sản phẩm</h2>
+                <div class="sort-wrapper">
+                    <span class="sort-label">Sắp xếp:</span>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="newest" ${param.sort == 'newest' ? 'selected' : ''}>Mới nhất</option>
+                        <option value="price_asc" ${param.sort == 'price_asc' ? 'selected' : ''}>Giá thấp → cao</option>
+                        <option value="price_desc" ${param.sort == 'price_desc' ? 'selected' : ''}>Giá cao → thấp</option>
+                        <option value="name_asc" ${param.sort == 'name_asc' ? 'selected' : ''}>Tên A → Z</option>
+                    </select>
                 </div>
             </div>
-
-            <div class="col-xl-10 col-lg-9">
-                
-                <div class="row g-3 mb-4 bg-white p-2 rounded-3 shadow-sm mx-0">
-                    <div class="col-md-7 px-1">
-                        <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&h=300&q=80" alt="Banner 1" class="banner-img">
-                    </div>
-                    <div class="col-md-5 px-1">
-                        <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=600&h=300&q=80" alt="Banner 2" class="banner-img">
-                    </div>
-                </div>
-
-                <div class="bg-white p-3 rounded-3 shadow-sm mb-4">
-                    <div class="d-flex flex-wrap justify-content-between gap-2">
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-1"><i class="fas fa-fire"></i></div><span>Hàng Mới Về</span></a>
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-2"><i class="fas fa-mars"></i></div><span>Kính Nam</span></a>
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-6"><i class="fas fa-venus"></i></div><span>Kính Nữ</span></a>
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-3"><i class="fas fa-percentage"></i></div><span>Giảm Giá</span></a>
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-7"><i class="fas fa-gem"></i></div><span>Gọng Titanium</span></a>
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-4"><i class="fas fa-sun"></i></div><span>Kính Râm</span></a>
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-8"><i class="fas fa-box-open"></i></div><span>Phụ Kiện</span></a>
-                        <a href="#" class="quick-link-item"><div class="icon-circle bg-5"><i class="fas fa-eye"></i></div><span>Tròng Kính</span></a>
-                    </div>
-                </div>
-
-                <div class="bg-white p-3 rounded-3 shadow-sm">
-                    <h5 class="mb-4 text-dark fw-bold px-2 py-2 border-bottom">Xu Hướng Kính Mắt Dành Cho Bạn</h5>
-                    
-                    <div class="row g-3">
-                        <c:forEach var="p" items="${featured}">
-                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                                <div class="card h-100 product-card overflow-hidden bg-white">
-                                    <a href="${root}/product?id=${p.id}" class="text-decoration-none text-dark">
-                                        <img src="${root}/${p.image}" class="card-img-top" alt="${p.name}" onerror="this.onerror=null; this.src='https://salt.tikicdn.com/cache/280x280/ts/product/4e/9e/d4/0d8b76c8c49e29fbd342207ff0132df7.jpg'">
-                                        <div class="card-body p-2">
-                                            <p class="card-title mb-1 text-truncate" style="font-size: 13px;"><c:out value="${p.name}"/></p>
-                                            <div class="fw-bold text-danger fs-6">
-                                                <fmt:formatNumber value="${p.salePrice}" pattern="#,###"/> ₫
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
+            
+            <div class="product-count">
+                Hiển thị <strong>${fn:length(products)}</strong> / <strong>${totalProducts}</strong> sản phẩm
+            </div>
+            
+            <!-- Product Grid -->
+            <div class="product-grid">
+                <c:forEach var="p" items="${products}">
+                    <a href="${root}/product?id=${p.id}" class="product-card">
+                        <div class="product-img-wrapper">
+                            <img src="${root}${p.image}" class="product-img" alt="${p.name}" 
+                                 onerror="this.src='https://placehold.co/300x300?text=No+Image'">
+                            <c:if test="${p.price > p.salePrice && p.price != 0}">
+    <span class="product-badge">
+        -${(1 - (p.salePrice * 1.0) / p.price) * 100}%
+    </span>
+</c:if>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">${p.name}</div>
+                            <div>
+                                <span class="product-price">
+                                    <fmt:formatNumber value="${p.salePrice}" pattern="#,###"/>₫
+                                </span>
+                                <c:if test="${p.price > p.salePrice}">
+                                    <span class="product-old-price">
+                                        <fmt:formatNumber value="${p.price}" pattern="#,###"/>₫
+                                    </span>
+                                </c:if>
                             </div>
-                        </c:forEach>
-                        
-                        <c:if test="${empty featured}">
-                            <div class="col-12 py-5 text-center text-muted">
-                                <i class="fas fa-box-open fs-1 mb-3 text-light"></i>
-                                <p>Chưa có sản phẩm nổi bật nào.</p>
+                            <div class="product-stock ${p.stock <= 0 ? 'out' : ''}">
+                                <c:choose>
+                                    <c:when test="${p.stock <= 0}">
+                                        <i class="fas fa-times-circle me-1"></i>Hết hàng
+                                    </c:when>
+                                    <c:when test="${p.stock < 10}">
+                                        <i class="fas fa-exclamation-circle me-1"></i>Còn ${p.stock} sản phẩm
+                                    </c:when>
+                                    <c:otherwise>
+                                        <i class="fas fa-check-circle me-1"></i>Còn hàng
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
-                        </c:if>
-                    </div>
+                        </div>
+                    </a>
+                </c:forEach>
+            </div>
+            
+            <!-- Empty State -->
+            <c:if test="${empty products}">
+                <div class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <h5>Không tìm thấy sản phẩm</h5>
+                    <p class="text-muted">Vui lòng thử lại với bộ lọc khác</p>
+                    <a href="${root}/home" class="btn btn-danger rounded-pill px-4 mt-3">Xem tất cả sản phẩm</a>
                 </div>
-
-            </div> </div>
-    </main>
-
-    <div class="floating-widget">
-        <a href="#" class="floating-btn"><i class="fas fa-eye"></i><span>Tư vấn</span></a>
-        <div style="height: 1px; background: rgba(255,255,255,0.2); width: 80%; margin: 0 auto;"></div>
-        <a href="#" class="floating-btn"><i class="far fa-comment-dots"></i><span>Hỗ trợ</span></a>
+            </c:if>
+            
+            <!-- Pagination -->
+            <c:if test="${totalPages > 1}">
+                <div class="pagination-container">
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" data-page="${currentPage - 1}">«</a>
+                            </li>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                                </li>
+                            </c:forEach>
+                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="#" data-page="${currentPage + 1}">»</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </c:if>
+        </div>
     </div>
+</main>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Xử lý sort
+    const sortSelect = document.getElementById('sortSelect');
+    const sortInput = document.getElementById('sortInput');
+    const filterForm = document.getElementById('filterForm');
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            // Chức năng Toggle menu con
-            document.querySelectorAll('.menu-toggle').forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const parentId = this.dataset.id;
-                    const childMenu = document.getElementById('child-' + parentId);
-                    if (childMenu) childMenu.classList.toggle('show');
-                });
-            });
-
-            // Load sản phẩm theo danh mục
-            document.querySelectorAll('.menu-item').forEach(item => {
-                if(item.dataset.id) {
-                    item.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const catId = this.dataset.id;
-
-                        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                        this.classList.add('active');
-
-                        fetch(`${root}/categoryProducts?id=` + catId)
-                            .then(res => res.text())
-                            .then(html => {
-                                const container = document.getElementById('product-container');
-                                if (container) {
-                                    container.innerHTML = html;
-                                    container.scrollIntoView({ behavior: 'smooth' });
-                                }
-                            })
-                            .catch(err => console.error('Lỗi load sản phẩm:', err));
-                    });
-                }
-            });
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            sortInput.value = this.value;
+            filterForm.submit();
         });
-    </script>
+    }
+    
+    // Xử lý pagination
+    document.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.dataset.page;
+            if (page && !this.parentElement.classList.contains('disabled')) {
+                const pageInput = document.createElement('input');
+                pageInput.type = 'hidden';
+                pageInput.name = 'page';
+                pageInput.value = page;
+                filterForm.appendChild(pageInput);
+                filterForm.submit();
+            }
+        });
+    });
+    
+    // Tự động submit khi thay đổi radio
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            filterForm.submit();
+        });
+    });
+</script>
 </body>
 </html>
