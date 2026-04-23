@@ -28,7 +28,34 @@ public class User {
     private String dob;    // Ngày sinh
     private String avatar; // Đường dẫn ảnh đại diện
     private String address;
+// Thêm các trường vào class User
 
+private int totalOrders;      // Tổng số đơn hàng đã hoàn thành
+private double totalSpent;    // Tổng tiền đã chi tiêu
+
+// Getters and Setters
+public int getTotalOrders() { return totalOrders; }
+public void setTotalOrders(int totalOrders) { this.totalOrders = totalOrders; }
+
+public double getTotalSpent() { return totalSpent; }
+public void setTotalSpent(double totalSpent) { this.totalSpent = totalSpent; }
+
+// Helper method để phân loại khách hàng
+public String getCustomerTier() {
+    if (totalSpent >= 10000000) return "VIP Kim cương";
+    if (totalSpent >= 5000000) return "VIP Vàng";
+    if (totalSpent >= 1000000) return "Thân thiết";
+    if (totalOrders >= 5) return "Trung thành";
+    return "Tiềm năng";
+}
+
+public String getTierBadgeClass() {
+    if (totalSpent >= 10000000) return "badge-tier-diamond";
+    if (totalSpent >= 5000000) return "badge-tier-gold";
+    if (totalSpent >= 1000000) return "badge-tier-silver";
+    if (totalOrders >= 5) return "badge-tier-bronze";
+    return "badge-tier-potential";
+}
     public User() {
     }
 

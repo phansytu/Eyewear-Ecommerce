@@ -3,6 +3,8 @@ package DAO;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import model.User;
@@ -470,15 +472,31 @@ public class UserDAO {
  * Lấy tổng số người dùng
  * @return tổng số người dùng
  */
+/**
+ * Lấy tổng số user (không bao gồm user đã xóa mềm)
+ */
 public int getTotalUsers() {
-    String sql = "SELECT COUNT(*) as total FROM users WHERE role = 'user'";
-    
+    String sql = "SELECT COUNT(*) FROM users WHERE status != 'deleted'";
     try (Connection conn = DBConnect.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql);
          ResultSet rs = ps.executeQuery()) {
-        
+        if (rs.next()) return rs.getInt(1);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+/**
+ * Lấy tổng số user có role = 'user' (khách hàng, không bao gồm admin)
+ */
+public int getTotalCustomerUsers() {
+    String sql = "SELECT COUNT(*) FROM users WHERE role = 'user' AND status != 'deleted'";
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
         if (rs.next()) {
-            return rs.getInt("total");
+            return rs.getInt(1);
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -505,4 +523,321 @@ public int getNewUsersThisMonth() {
     }
     return 0;
 }
+    
+    // ==========================================
+    // PHẦN HIỆN CÓ (giữ nguyên)
+    // ==========================================
+    
+    // Các phương thức cũ của bạn vẫn giữ nguyên...
+    // (authenticate, register, getUserByUsername, v.v...)
+    
+    // ==========================================
+    // PHẦN THÊM MỚI CHO QUẢN LÝ ADMIN
+    // ==========================================
+    
+    /**
+     * Lấy danh sách tất cả users kèm thống kê đơn hàng (tổng số đơn, tổng tiền)
+     * KHÔNG cần thêm cột vào database
+     */
+    public List<User> getAllUsersWithStats() {
+        List<User> users = new ArrayList<>();
+        String sql = """
+            SELECT u.*, 
+                   COUNT(o.id) as total_orders,
+                   COALESCE(SUM(o.total_amount), 0) as total_spent
+            FROM users u
+            LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'delivered'
+            GROUP BY u.id
+            ORDER BY total_spent DESC
+            """;
+        
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                User user = mapResultSetToUser(rs);
+                user.setTotalOrders(rs.getInt("total_orders"));
+                user.setTotalSpent(rs.getDouble("total_spent"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Lấy user theo ID kèm thống kê đơn hàng
+     */
+    public User getUserWithStats(int userId) {
+        String sql = """
+            SELECT u.*, 
+                   COUNT(o.id) as total_orders,
+                   COALESCE(SUM(o.total_amount), 0) as total_spent
+            FROM users u
+            LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'delivered'
+            WHERE u.id = ?
+            GROUP BY u.id
+            """;
+        
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = mapResultSetToUser(rs);
+                user.setTotalOrders(rs.getInt("total_orders"));
+                user.setTotalSpent(rs.getDouble("total_spent"));
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
+     * Tìm kiếm users theo từ khóa
+     */
+    public List<User> searchUsers(String keyword) {
+        List<User> users = new ArrayList<>();
+        String sql = """
+            SELECT u.*, 
+                   COUNT(o.id) as total_orders,
+                   COALESCE(SUM(o.total_amount), 0) as total_spent
+            FROM users u
+            LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'delivered'
+            WHERE u.username LIKE ? OR u.email LIKE ? OR u.full_name LIKE ? OR u.phone LIKE ?
+            GROUP BY u.id
+            ORDER BY u.id DESC
+            """;
+        
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            String searchPattern = "%" + keyword + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            ps.setString(3, searchPattern);
+            ps.setString(4, searchPattern);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                User user = mapResultSetToUser(rs);
+                user.setTotalOrders(rs.getInt("total_orders"));
+                user.setTotalSpent(rs.getDouble("total_spent"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Lấy users theo role
+     */
+    public List<User> getUsersByRole(String role) {
+        List<User> users = new ArrayList<>();
+        String sql = """
+            SELECT u.*, 
+                   COUNT(o.id) as total_orders,
+                   COALESCE(SUM(o.total_amount), 0) as total_spent
+            FROM users u
+            LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'delivered'
+            WHERE u.role = ?
+            GROUP BY u.id
+            ORDER BY u.id DESC
+            """;
+        
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, role);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                User user = mapResultSetToUser(rs);
+                user.setTotalOrders(rs.getInt("total_orders"));
+                user.setTotalSpent(rs.getDouble("total_spent"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Lấy users theo status
+     */
+    public List<User> getUsersByStatus(String status) {
+        List<User> users = new ArrayList<>();
+        String sql = """
+            SELECT u.*, 
+                   COUNT(o.id) as total_orders,
+                   COALESCE(SUM(o.total_amount), 0) as total_spent
+            FROM users u
+            LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'delivered'
+            WHERE u.status = ?
+            GROUP BY u.id
+            ORDER BY u.id DESC
+            """;
+        
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                User user = mapResultSetToUser(rs);
+                user.setTotalOrders(rs.getInt("total_orders"));
+                user.setTotalSpent(rs.getDouble("total_spent"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Khóa tài khoản user
+     */
+    public boolean lockUser(int userId) {
+        String sql = "UPDATE users SET status = 'locked' WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Mở khóa tài khoản user
+     */
+    public boolean unlockUser(int userId) {
+        String sql = "UPDATE users SET status = 'active' WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Đổi role user (user -> admin hoặc ngược lại)
+     */
+    public boolean changeUserRole(int userId, String newRole) {
+        String sql = "UPDATE users SET role = ? WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newRole);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Kích hoạt user
+     */
+    public boolean activateUser(int userId) {
+        return unlockUser(userId);
+    }
+    
+    /**
+     * Xóa user (soft delete - chuyển status thành 'deleted')
+     */
+    public boolean deleteUser(int userId) {
+        String sql = "UPDATE users SET status = 'deleted' WHERE id = ?";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Lấy tổng số users
+     */
+
+    
+    /**
+     * Lấy số user đang hoạt động
+     */
+    public int getActiveUsersCount() {
+        String sql = "SELECT COUNT(*) FROM users WHERE status = 'active'";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Lấy số user bị khóa
+     */
+    public int getLockedUsersCount() {
+        String sql = "SELECT COUNT(*) FROM users WHERE status = 'locked'";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Lấy số user là admin
+     */
+    public int getAdminUsersCount() {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = 'admin'";
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Lấy số user VIP (tổng chi tiêu > 5,000,000)
+     */
+    public int getVipUsersCount() {
+        String sql = """
+            SELECT COUNT(*) FROM (
+                SELECT u.id, COALESCE(SUM(o.total_amount), 0) as total_spent
+                FROM users u
+                LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'delivered'
+                GROUP BY u.id
+                HAVING total_spent > 5000000
+            ) as vip_users
+            """;
+        try (Connection conn = DBConnect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+   
+    
 }

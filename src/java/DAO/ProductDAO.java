@@ -18,7 +18,9 @@ public class ProductDAO {
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE p.status != 'deleted'
@@ -30,7 +32,10 @@ public class ProductDAO {
              ResultSet rs = ps.executeQuery()) {
             
             while (rs.next()) {
-                products.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                products.add(product);
             }
             System.out.println("✅ Loaded " + products.size() + " products");
         } catch (SQLException e) {
@@ -43,7 +48,9 @@ public class ProductDAO {
     public List<Product> getActiveProducts() {
         List<Product> products = new ArrayList<>();
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE p.status = 'active' 
@@ -55,7 +62,10 @@ public class ProductDAO {
              ResultSet rs = ps.executeQuery()) {
             
             while (rs.next()) {
-                products.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                products.add(product);
             }
         } catch (SQLException e) {
             System.err.println("❌ getActiveProducts: " + e.getMessage());
@@ -64,11 +74,13 @@ public class ProductDAO {
     }
     
     // ========================================
-    // 2. LẤY SẢN PHẨM THEO ID
+    // 2. LẤY SẢN PHẨM THEO ID (Kèm rating)
     // ========================================
     public Product getProductById(int id) {
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE p.id = ?
@@ -81,8 +93,13 @@ public class ProductDAO {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Product product = extractProductFull(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                
+                // Load images & variants
                 product.setImages(getProductImages(id));
                 product.setVariants(getProductVariants(id));
+                
                 return product;
             }
         } catch (SQLException e) {
@@ -97,7 +114,9 @@ public class ProductDAO {
     public List<Product> getProductsByCategory(int categoryId) {
         List<Product> products = new ArrayList<>();
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE p.category_id = ? AND p.status = 'active' 
@@ -110,7 +129,10 @@ public class ProductDAO {
             ResultSet rs = ps.executeQuery();
             
             while (rs.next()) {
-                products.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                products.add(product);
             }
         } catch (SQLException e) {
             System.err.println("❌ getProductsByCategory: " + e.getMessage());
@@ -122,7 +144,9 @@ public class ProductDAO {
     public List<Product> getProductsByParentCategory(int parentCategoryId) {
         List<Product> products = new ArrayList<>();
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE (p.category_id = ? OR p.category_id IN (SELECT id FROM categories WHERE parent_id = ?)) 
@@ -137,7 +161,10 @@ public class ProductDAO {
             ResultSet rs = ps.executeQuery();
             
             while (rs.next()) {
-                products.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                products.add(product);
             }
         } catch (SQLException e) {
             System.err.println("❌ getProductsByParentCategory: " + e.getMessage());
@@ -151,7 +178,9 @@ public class ProductDAO {
     public List<Product> getFeaturedProducts(int limit) {
         List<Product> featured = new ArrayList<>();
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE p.is_featured = TRUE AND p.status = 'active' 
@@ -162,7 +191,10 @@ public class ProductDAO {
             ps.setInt(1, limit);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                featured.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                featured.add(product);
             }
         } catch (SQLException e) {
             System.err.println("❌ getFeaturedProducts: " + e.getMessage());
@@ -176,7 +208,9 @@ public class ProductDAO {
     public List<Product> searchProducts(String keyword) {
         List<Product> products = new ArrayList<>();
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE (p.name LIKE ? OR p.brand LIKE ?) AND p.status != 'deleted'
@@ -190,7 +224,10 @@ public class ProductDAO {
             ps.setString(2, searchPattern);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                products.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                products.add(product);
             }
         } catch (SQLException e) {
             System.err.println("❌ searchProducts: " + e.getMessage());
@@ -198,11 +235,16 @@ public class ProductDAO {
         return products;
     }
     
-    // Tìm kiếm nâng cao (có filter)
-    public List<Product> searchProductsAdvanced(String keyword, String categoryId, String minPrice, String maxPrice, String gender) {
+    /**
+     * Tìm kiếm sản phẩm nâng cao với nhiều bộ lọc
+     */
+    public List<Product> searchProductsAdvanced(String keyword, String categoryId, String minPrice, 
+                                                 String maxPrice, String gender, String frameMaterial, String sort) {
         List<Product> products = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE p.status = 'active'
@@ -210,15 +252,22 @@ public class ProductDAO {
         
         List<Object> params = new ArrayList<>();
         
+        // Tìm kiếm theo từ khóa
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (p.name LIKE ? OR p.brand LIKE ?)");
-            params.add("%" + keyword + "%");
-            params.add("%" + keyword + "%");
+            sql.append(" AND (p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)");
+            String searchPattern = "%" + keyword.trim() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+            params.add(searchPattern);
         }
+        
+        // Lọc theo danh mục
         if (categoryId != null && !categoryId.isEmpty() && !categoryId.equals("0")) {
             sql.append(" AND p.category_id = ?");
             params.add(Integer.parseInt(categoryId));
         }
+        
+        // Lọc theo giá
         if (minPrice != null && !minPrice.isEmpty()) {
             sql.append(" AND p.sale_price >= ?");
             params.add(new BigDecimal(minPrice));
@@ -227,12 +276,37 @@ public class ProductDAO {
             sql.append(" AND p.sale_price <= ?");
             params.add(new BigDecimal(maxPrice));
         }
+        
+        // Lọc theo giới tính
         if (gender != null && !gender.isEmpty() && !gender.equals("all")) {
             sql.append(" AND p.gender = ?");
             params.add(gender);
         }
         
-        sql.append(" ORDER BY p.is_featured DESC, p.created_at DESC LIMIT 50");
+        // Lọc theo chất liệu gọng
+        if (frameMaterial != null && !frameMaterial.isEmpty() && !frameMaterial.equals("all")) {
+            sql.append(" AND p.frame_material = ?");
+            params.add(frameMaterial);
+        }
+        
+        // Sắp xếp
+        switch (sort) {
+            case "price_asc":
+                sql.append(" ORDER BY p.sale_price ASC");
+                break;
+            case "price_desc":
+                sql.append(" ORDER BY p.sale_price DESC");
+                break;
+            case "name_asc":
+                sql.append(" ORDER BY p.name ASC");
+                break;
+            case "best_seller":
+                sql.append(" ORDER BY p.sold_quantity DESC");
+                break;
+            default: // newest
+                sql.append(" ORDER BY p.created_at DESC");
+                break;
+        }
         
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -243,108 +317,16 @@ public class ProductDAO {
             
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                products.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                products.add(product);
             }
         } catch (SQLException e) {
             System.err.println("❌ searchProductsAdvanced: " + e.getMessage());
         }
         return products;
     }
-    /**
- * Tìm kiếm sản phẩm nâng cao với nhiều bộ lọc
- * @param keyword Từ khóa tìm kiếm
- * @param categoryId ID danh mục
- * @param minPrice Giá tối thiểu
- * @param maxPrice Giá tối đa
- * @param gender Giới tính
- * @param frameMaterial Chất liệu gọng
- * @param sort Sắp xếp (newest, price_asc, price_desc, name_asc, best_seller)
- * @return List<Product>
- */
-public List<Product> searchProductsAdvanced(String keyword, String categoryId, String minPrice, 
-                                             String maxPrice, String gender, String frameMaterial, String sort) {
-    List<Product> products = new ArrayList<>();
-    StringBuilder sql = new StringBuilder("""
-        SELECT p.*, c.name as category_name 
-        FROM products p 
-        LEFT JOIN categories c ON p.category_id = c.id 
-        WHERE p.status = 'active'
-        """);
-    
-    List<Object> params = new ArrayList<>();
-    
-    // Tìm kiếm theo từ khóa
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND (p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)");
-        String searchPattern = "%" + keyword.trim() + "%";
-        params.add(searchPattern);
-        params.add(searchPattern);
-        params.add(searchPattern);
-    }
-    
-    // Lọc theo danh mục
-    if (categoryId != null && !categoryId.isEmpty() && !categoryId.equals("0")) {
-        sql.append(" AND p.category_id = ?");
-        params.add(Integer.parseInt(categoryId));
-    }
-    
-    // Lọc theo giá
-    if (minPrice != null && !minPrice.isEmpty()) {
-        sql.append(" AND p.sale_price >= ?");
-        params.add(new java.math.BigDecimal(minPrice));
-    }
-    if (maxPrice != null && !maxPrice.isEmpty()) {
-        sql.append(" AND p.sale_price <= ?");
-        params.add(new java.math.BigDecimal(maxPrice));
-    }
-    
-    // Lọc theo giới tính
-    if (gender != null && !gender.isEmpty() && !gender.equals("all")) {
-        sql.append(" AND p.gender = ?");
-        params.add(gender);
-    }
-    
-    // Lọc theo chất liệu gọng
-    if (frameMaterial != null && !frameMaterial.isEmpty() && !frameMaterial.equals("all")) {
-        sql.append(" AND p.frame_material = ?");
-        params.add(frameMaterial);
-    }
-    
-    // Sắp xếp
-    switch (sort) {
-        case "price_asc":
-            sql.append(" ORDER BY p.sale_price ASC");
-            break;
-        case "price_desc":
-            sql.append(" ORDER BY p.sale_price DESC");
-            break;
-        case "name_asc":
-            sql.append(" ORDER BY p.name ASC");
-            break;
-        case "best_seller":
-            sql.append(" ORDER BY p.sold_quantity DESC");
-            break;
-        default: // newest
-            sql.append(" ORDER BY p.created_at DESC");
-            break;
-    }
-    
-    try (Connection conn = DBConnect.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-        
-        for (int i = 0; i < params.size(); i++) {
-            ps.setObject(i + 1, params.get(i));
-        }
-        
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            products.add(extractProductBasic(rs));
-        }
-    } catch (SQLException e) {
-        System.err.println("❌ searchProductsAdvanced: " + e.getMessage());
-    }
-    return products;
-}
     
     // ========================================
     // 6. LỌC THEO TRẠNG THÁI (Admin)
@@ -352,7 +334,9 @@ public List<Product> searchProductsAdvanced(String keyword, String categoryId, S
     public List<Product> getProductsByStatus(String status) {
         List<Product> products = new ArrayList<>();
         String sql = """
-            SELECT p.*, c.name as category_name 
+            SELECT p.*, c.name as category_name,
+                   COALESCE(p.average_rating, 0) as average_rating,
+                   COALESCE(p.total_reviews, 0) as total_reviews
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
             WHERE p.status = ? 
@@ -364,7 +348,10 @@ public List<Product> searchProductsAdvanced(String keyword, String categoryId, S
             ps.setString(1, status);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                products.add(extractProductBasic(rs));
+                Product product = extractProductBasic(rs);
+                product.setAverageRating(rs.getDouble("average_rating"));
+                product.setTotalReviews(rs.getInt("total_reviews"));
+                products.add(product);
             }
         } catch (SQLException e) {
             System.err.println("❌ getProductsByStatus: " + e.getMessage());

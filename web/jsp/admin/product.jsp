@@ -44,6 +44,12 @@
             background-color: #007bff !important;
             color: white !important;
         }
+        
+        /* Đảm bảo modal có thanh cuộn */
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -181,10 +187,9 @@
                                     <td><input type="checkbox" class="product-checkbox" value="${product.id}"></td>
                                     <td><span class="text-muted">${product.id}</span></td>
                                     <td>
-                                        <%-- SỬA ĐƯỜNG DẪN ẢNH ĐÚNG VỚI THƯ MỤC image/anhdanhmuc --%>
                                         <c:choose>
                                             <c:when test="${not empty product.image}">
-                                                <img src="${root}/${product.image}" 
+                                                <img src="${root}${product.image}" 
                                                      class="product-img" 
                                                      onerror="this.src='${root}/image/anhdanhmuc/no-image.png'"
                                                      alt="${product.name}">
@@ -215,6 +220,7 @@
                                                 <fmt:formatNumber value="${product.price}" pattern="#,###"/>₫
                                             </small>
                                         </c:if>
+                                    </div>
                                     </td>
                                     <td>
                                         <c:choose>
@@ -228,6 +234,7 @@
                                                 <span class="badge bg-success">${product.stock}</span>
                                             </c:otherwise>
                                         </c:choose>
+                                    </div>
                                     </td>
                                     <td>
                                         <c:choose>
@@ -238,6 +245,7 @@
                                                 <span class="badge badge-inactive">Đã ẩn</span>
                                             </c:otherwise>
                                         </c:choose>
+                                    </div>
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
@@ -269,6 +277,7 @@
                                                 <i class="fa-solid fa-trash"></i>
                                             </a>
                                         </div>
+                                    </div>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -278,6 +287,7 @@
                                     <td colspan="9" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-box-open fa-3x mb-3 d-block"></i>
                                         Không có sản phẩm nào
+                                    </div>
                                     </td>
                                 </tr>
                             </c:if>
@@ -291,7 +301,7 @@
 
 <!-- Modal Thêm/Sửa sản phẩm -->
 <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content shadow-lg">
             <form method="POST" action="${root}/admin/products" enctype="multipart/form-data" id="productForm">
                 <div class="modal-header bg-primary text-white">
@@ -301,7 +311,7 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4">
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                     <input type="hidden" name="action" id="formAction" value="add">
                     <input type="hidden" name="id" id="productId" value="">
                     
