@@ -50,7 +50,7 @@ public class UnlockAccountServlet extends HttpServlet {
             otpDao.deleteOldOTP(user.getId(), "unlock");
             
             // Tạo OTP mới
-            String otp = OTPUtil.generateOTP();
+            String otp = OTPUtil.generateOTP(6);
             if (otpDao.saveOTP(user.getId(), otp, "unlock", 10)) {
                 String emailBody = EmailUtil.getOtpEmailBody(user.getUsername(), otp, 10);
                 if (EmailUtil.sendEmail(email, "Mã OTP mở khóa tài khoản", emailBody)) {
