@@ -3,7 +3,8 @@ build/
 dist/
 nbbuild/
 nbdist/
-
+src/java/util/DBConnect.java
+Libraries_JavaMail/
 # --- CHIA SẺ CẤU HÌNH SERVER & THƯ VIỆN ---
 !/nbproject/project.xml
 !/nbproject/project.properties

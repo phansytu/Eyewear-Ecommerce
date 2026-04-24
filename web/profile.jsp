@@ -1,6 +1,7 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
@@ -22,9 +23,7 @@
             display: inline-block;
             cursor: pointer;
         }
-        .avatar-wrapper:hover .avatar-overlay {
-            opacity: 1;
-        }
+        .avatar-wrapper:hover .avatar-overlay { opacity: 1; }
         .avatar-overlay {
             position: absolute;
             top: 0;
@@ -41,9 +40,7 @@
             color: white;
             font-size: 14px;
         }
-        .avatar-overlay i {
-            font-size: 24px;
-        }
+        .avatar-overlay i { font-size: 24px; }
         .avatar-img {
             width: 80px;
             height: 80px;
@@ -58,10 +55,7 @@
         .status-processing { background-color: #fff3cd; color: #856404; }
         .status-shipped { background-color: #d1ecf1; color: #0c5460; }
         .status-cancelled { background-color: #f8d7da; color: #721c24; }
-        .cropper-container {
-            max-width: 100%;
-            max-height: 400px;
-        }
+        .cropper-container { max-width: 100%; max-height: 400px; }
         .preview-circle {
             width: 150px;
             height: 150px;
@@ -70,13 +64,8 @@
             margin: 0 auto;
             border: 3px solid #ddd;
         }
-        .preview-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .preview-circle img { width: 100%; height: 100%; object-fit: cover; }
     </style>
-    <!-- Cropper.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 </head>
 <body>
@@ -129,7 +118,7 @@
                         </div>
                     </div>
                     <form id="avatarForm" action="${root}/profile" method="POST" enctype="multipart/form-data" style="display: none;">
-                        <input type="file" id="avatarInput" name="avatar" accept="imagesAvt/*" onchange="previewAndCrop(this)">
+                        <input type="file" id="avatarInput" name="avatar" accept="image/*" onchange="previewAndCrop(this)">
                         <input type="hidden" name="action" value="updateAvatar">
                         <input type="hidden" name="croppedImage" id="croppedImage">
                     </form>
@@ -139,20 +128,20 @@
                 <div class="p-3">
                     <ul class="nav nav-pills flex-column" id="profileTabs" role="tablist">
                         <li class="nav-item mb-2">
-                            <a class="nav-link ${activeTab == 'profile' ? 'active' : ''}" id="profile-tab" data-bs-toggle="pill" href="#profile" role="tab">
+                            <button class="nav-link ${activeTab == 'profile' ? 'active' : ''}" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile" type="button" role="tab">
                                 <i class="fas fa-user-circle me-2"></i> Hồ sơ của tôi
-                            </a>
+                            </button>
                         </li>
                         <li class="nav-item mb-2">
-                            <a class="nav-link ${activeTab == 'orders' ? 'active' : ''}" id="orders-tab" data-bs-toggle="pill" href="#orders" role="tab">
+                            <button class="nav-link ${activeTab == 'orders' ? 'active' : ''}" id="orders-tab" data-bs-toggle="pill" data-bs-target="#orders" type="button" role="tab">
                                 <i class="fas fa-clipboard-list me-2"></i> Đơn mua
-                                <span class="badge bg-secondary ms-2">3</span>
-                            </a>
+                                <span class="badge bg-secondary ms-2">${fn:length(orders)}</span>
+                            </button>
                         </li>
                         <li class="nav-item mb-2">
-                            <a class="nav-link ${activeTab == 'security' ? 'active' : ''}" id="security-tab" data-bs-toggle="pill" href="#security" role="tab">
+                            <button class="nav-link ${activeTab == 'security' ? 'active' : ''}" id="security-tab" data-bs-toggle="pill" data-bs-target="#security" type="button" role="tab">
                                 <i class="fas fa-shield-alt me-2"></i> Bảo mật
-                            </a>
+                            </button>
                         </li>
                         <li class="nav-item mt-3">
                             <hr class="my-2">
@@ -257,112 +246,99 @@
                 </div>
 
                 <!-- Tab Đơn mua -->
-<div class="tab-pane fade ${activeTab == 'orders' ? 'show active' : ''}" id="orders" role="tabpanel">
-    <div class="bg-white rounded-3 shadow-sm p-4">
-        <h4 class="fw-bold mb-4">Đơn Mua Của Tôi</h4>
-        
-        <!-- Filter buttons -->
-        <div class="mb-3">
-            <div class="btn-group flex-wrap" role="group">
-                <button type="button" class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">Tất cả</button>
-                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="pending">Chờ xác nhận</button>
-                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="confirmed">Đã xác nhận</button>
-                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="shipping">Đang giao</button>
-                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="delivered">Đã giao</button>
-                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="cancelled">Đã hủy</button>
-            </div>
-        </div>
-        
-        <c:choose>
-            <c:when test="${empty orders}">
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-box-open fs-1 mb-3 d-block"></i>
-                    <p>Bạn chưa có đơn hàng nào.</p>
-                    <a href="${root}/home" class="btn btn-primary mt-3">Mua sắm ngay</a>
-                </div>
-            </c:when>
-            <c:otherwise>
-                <div id="ordersContainer">
-                    <c:forEach var="order" items="${orders}">
-                        <div class="order-card border rounded-3 p-3 mb-3" data-order-status="${order.status}">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                                <div>
-                                    <span class="text-muted small">Mã đơn hàng:</span>
-                                    <strong>#${order.id}</strong>
-                                    <span class="text-muted small ms-3">
-                                        <i class="far fa-calendar-alt me-1"></i>
-                                        <fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="status-badge ${order.statusBadgeClass}">
-                                        <i class="fas ${order.statusIcon} me-1"></i>
-                                        ${order.statusText}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <c:forEach var="detail" items="${order.orderDetails}" varStatus="loop">
-                                <div class="d-flex gap-3 ${!loop.last ? 'mb-3' : ''}">
-                                    <img src="${not empty detail.productImage ? root.concat('/').concat(detail.productImage) : root.concat('/images/no-image.png')}" 
-                                         class="rounded border" 
-                                         width="80" height="80" 
-                                         alt="${detail.productName}"
-                                         onerror="this.src='${root}/images/no-image.png'">
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">${detail.productName}</h6>
-                                        <c:if test="${not empty detail.variantName}">
-                                            <p class="text-muted small mb-1">Phân loại: ${detail.variantName}</p>
-                                        </c:if>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <span class="text-danger fw-bold">
-                                                    <fmt:formatNumber value="${detail.price}" pattern="#,###"/> ₫
-                                                </span>
-                                                <span class="text-muted small ms-2">x${detail.quantity}</span>
-                                            </div>
-                                            <c:if test="${order.status == 'delivered'}">
-                                                <button class="btn btn-sm btn-outline-primary buy-again-btn" 
-                                                        data-product-id="${detail.productId}"
-                                                        data-variant-id="${detail.variantId}">
-                                                    Mua lại
-                                                </button>
-                                            </c:if>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                            
-                            <div class="border-top mt-3 pt-2">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="text-muted small">Địa chỉ: ${order.address}</span>
-                                        <br>
-                                        <span class="text-muted small">SĐT: ${order.phone}</span>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="text-muted">Thành tiền: </span>
-                                        <strong class="text-danger fs-5">
-                                            <fmt:formatNumber value="${order.totalAmount}" pattern="#,###"/> ₫
-                                        </strong>
-                                    </div>
-                                </div>
-                                
-                                <c:if test="${order.status == 'pending'}">
-                                    <div class="text-end mt-2">
-                                        <button class="btn btn-sm btn-danger cancel-order-btn" data-order-id="${order.id}">
-                                            <i class="fas fa-times me-1"></i> Hủy đơn hàng
-                                        </button>
-                                    </div>
-                                </c:if>
+                <div class="tab-pane fade ${activeTab == 'orders' ? 'show active' : ''}" id="orders" role="tabpanel">
+                    <div class="bg-white rounded-3 shadow-sm p-4">
+                        <h4 class="fw-bold mb-4">Đơn Mua Của Tôi</h4>
+                        
+                        <div class="mb-3">
+                            <div class="btn-group flex-wrap" role="group">
+                                <button type="button" class="btn btn-outline-primary btn-sm filter-btn active" data-status="all">Tất cả</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="pending">Chờ xác nhận</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="confirmed">Đã xác nhận</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="shipping">Đang giao</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="delivered">Đã giao</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm filter-btn" data-status="cancelled">Đã hủy</button>
                             </div>
                         </div>
-                    </c:forEach>
+                        
+                        <c:choose>
+                            <c:when test="${empty orders}">
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-box-open fs-1 mb-3 d-block"></i>
+                                    <p>Bạn chưa có đơn hàng nào.</p>
+                                    <a href="${root}/home" class="btn btn-primary mt-3">Mua sắm ngay</a>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div id="ordersContainer">
+                                    <c:forEach var="order" items="${orders}">
+                                        <div class="order-card border rounded-3 p-3 mb-3" data-order-status="${order.status}">
+                                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                                                <div>
+                                                    <span class="text-muted small">Mã đơn hàng:</span>
+                                                    <strong>#${order.id}</strong>
+                                                    <span class="text-muted small ms-3">
+                                                        <i class="far fa-calendar-alt me-1"></i>
+                                                        <fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="status-badge ${order.statusBadgeClass}">
+                                                        <i class="fas ${order.statusIcon} me-1"></i>
+                                                        ${order.statusText}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <c:forEach var="detail" items="${order.orderDetails}" varStatus="loop">
+                                                <div class="d-flex gap-3 ${!loop.last ? 'mb-3' : ''}">
+                                                    <img src="${not empty detail.productImage ? root.concat('/').concat(detail.productImage) : root.concat('/images/no-image.png')}" 
+                                                         class="rounded border" width="80" height="80" alt="${detail.productName}"
+                                                         onerror="this.src='${root}/images/no-image.png'">
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1">${detail.productName}</h6>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <span class="text-danger fw-bold">
+                                                                    <fmt:formatNumber value="${detail.price}" pattern="#,###"/> ₫
+                                                                </span>
+                                                                <span class="text-muted small ms-2">x${detail.quantity}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            
+                                            <div class="border-top mt-3 pt-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <span class="text-muted small">Địa chỉ: ${order.address}</span>
+                                                        <br>
+                                                        <span class="text-muted small">SĐT: ${order.phone}</span>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <span class="text-muted">Thành tiền: </span>
+                                                        <strong class="text-danger fs-5">
+                                                            <fmt:formatNumber value="${order.totalAmount}" pattern="#,###"/> ₫
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                                
+                                                <c:if test="${order.status == 'pending'}">
+                                                    <div class="text-end mt-2">
+                                                        <button class="btn btn-sm btn-danger cancel-order-btn" data-order-id="${order.id}">
+                                                            <i class="fas fa-times me-1"></i> Hủy đơn hàng
+                                                        </button>
+                                                    </div>
+                                                </c:if>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
-            </c:otherwise>
-        </c:choose>
-    </div>
-</div>
 
                 <!-- Tab Bảo mật -->
                 <div class="tab-pane fade ${activeTab == 'security' ? 'show active' : ''}" id="security" role="tabpanel">
@@ -457,6 +433,27 @@
     let currentFile;
     const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
     
+    // Khởi tạo Bootstrap tabs
+    const triggerTabList = document.querySelectorAll('#profileTabs button');
+    triggerTabList.forEach(triggerEl => {
+        const tabTrigger = new bootstrap.Tab(triggerEl);
+        triggerEl.addEventListener('click', event => {
+            event.preventDefault();
+            tabTrigger.show();
+        });
+    });
+    
+    // Active tab từ URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab) {
+        const targetTab = document.querySelector(`#profileTabs button[data-bs-target="#${tab}"]`);
+        if (targetTab) {
+            const tabTrigger = new bootstrap.Tab(targetTab);
+            tabTrigger.show();
+        }
+    }
+    
     function previewAndCrop(input) {
         if (input.files && input.files[0]) {
             currentFile = input.files[0];
@@ -466,7 +463,6 @@
                 document.getElementById('cropImage').src = e.target.result;
                 cropModal.show();
                 
-                // Khởi tạo cropper sau khi modal hiển thị
                 setTimeout(() => {
                     if (cropper) cropper.destroy();
                     const image = document.getElementById('cropImage');
@@ -486,17 +482,12 @@
     }
     
     function rotateImage(degree) {
-        if (cropper) {
-            cropper.rotate(degree);
-        }
+        if (cropper) cropper.rotate(degree);
     }
     
     function cropAndUpload() {
         if (cropper) {
-            const canvas = cropper.getCroppedCanvas({
-                width: 300,
-                height: 300,
-            });
+            const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
             
             canvas.toBlob(function(blob) {
                 const formData = new FormData();
@@ -510,7 +501,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Cập nhật ảnh hiển thị
                         document.getElementById('avatarPreview').src = data.avatarUrl + '?t=' + new Date().getTime();
                         cropModal.hide();
                         showNotification('Cập nhật ảnh đại diện thành công!', 'success');
@@ -528,20 +518,16 @@
     }
     
     function showNotification(message, type) {
-    const alertDiv = document.createElement('div');
-    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-    const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-    
-    alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-    alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        <i class="fas ${iconClass} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => alertDiv.remove(), 3000);
-}
+        const alertDiv = document.createElement('div');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        alertDiv.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertDiv.innerHTML = `<i class="fas ${iconClass} me-2"></i>${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
+    }
     
     function validatePassword() {
         var newPass = document.getElementById('newPassword').value;
@@ -551,25 +537,58 @@
             alert('Mật khẩu mới phải có ít nhất 6 ký tự!');
             return false;
         }
-        
         if (newPass !== confirmPass) {
             alert('Mật khẩu xác nhận không khớp!');
             return false;
         }
-        
         return true;
     }
     
-    // Active tab từ URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab');
-    if (tab) {
-        const tabTrigger = document.querySelector(`#profileTabs [data-bs-toggle="pill"][href="#${tab}"]`);
-        if (tabTrigger) {
-            const bsTab = new bootstrap.Tab(tabTrigger);
-            bsTab.show();
-        }
-    }
+    // Filter orders
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const status = this.dataset.status;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.querySelectorAll('.order-card').forEach(order => {
+                if (status === 'all' || order.dataset.orderStatus === status) {
+                    order.style.display = '';
+                } else {
+                    order.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Cancel order
+    document.querySelectorAll('.cancel-order-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const orderId = this.dataset.orderId;
+            if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+                try {
+                    const formData = new FormData();
+                    formData.append('action', 'cancelOrder');
+                    formData.append('orderId', orderId);
+                    
+                    const response = await fetch('${root}/profile', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification(result.message, 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Có lỗi xảy ra!', 'error');
+                }
+            }
+        });
+    });
 </script>
 </body>
 </html>

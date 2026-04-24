@@ -239,7 +239,7 @@ public class AdminProductServlet extends HttpServlet {
      * Xử lý thêm sản phẩm mới
      */
     private void handleAddProduct(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, Exception {
         
         Product product = extractProductFromRequest(request);
         
@@ -261,7 +261,7 @@ public class AdminProductServlet extends HttpServlet {
      * Xử lý cập nhật sản phẩm
      */
     private void handleUpdateProduct(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, Exception {
         
         String idParam = request.getParameter("id");
         if (idParam == null) {
@@ -291,41 +291,53 @@ public class AdminProductServlet extends HttpServlet {
     /**
      * Trích xuất dữ liệu sản phẩm từ request
      */
-    private Product extractProductFromRequest(HttpServletRequest request) throws ServletException, IOException {
-        Product product = new Product();
-        
-        // Thông tin cơ bản
-        product.setName(request.getParameter("name"));
-        product.setDescription(request.getParameter("description"));
-        product.setBrand(request.getParameter("brand"));
-        product.setGender(request.getParameter("gender"));
-        product.setFrameMaterial(request.getParameter("frameMaterial"));
-        product.setLensType(request.getParameter("lensType"));
-        
-        // Giá tiền
-        String priceStr = request.getParameter("price");
-        product.setPrice((priceStr != null && !priceStr.isEmpty()) ? new BigDecimal(priceStr) : BigDecimal.ZERO);
-        
-        String salePriceStr = request.getParameter("salePrice");
-        if (salePriceStr != null && !salePriceStr.trim().isEmpty()) {
-            product.setSalePrice(new BigDecimal(salePriceStr));
-        } else {
-            product.setSalePrice(null);
-        }
-        
-        // Số lượng và danh mục
-        String stockStr = request.getParameter("stock");
-        product.setStock(stockStr != null ? Integer.parseInt(stockStr) : 0);
-        
-        String categoryIdStr = request.getParameter("categoryId");
-        product.setCategoryId(categoryIdStr != null ? Integer.parseInt(categoryIdStr) : 0);
-        
-        // Checkbox
-        product.setUvProtection("on".equals(request.getParameter("uvProtection")));
-        product.setFeatured("on".equals(request.getParameter("isFeatured")));
-        
-        return product;
+    private Product extractProductFromRequest(HttpServletRequest request) throws Exception {
+    Product product = new Product();
+    
+    product.setName(request.getParameter("name"));
+    product.setDescription(request.getParameter("description"));
+    product.setBrand(request.getParameter("brand"));
+    
+    // Lấy gender từ form (có thể là "Nam", "Nữ", "Unisex")
+    String gender = request.getParameter("gender");
+    product.setGender(gender);
+    
+    product.setFrameMaterial(request.getParameter("frameMaterial"));
+    product.setLensType(request.getParameter("lensType"));
+    
+    String priceStr = request.getParameter("price");
+    if (priceStr != null && !priceStr.isEmpty()) {
+        product.setPrice(new BigDecimal(priceStr));
+    } else {
+        product.setPrice(BigDecimal.ZERO);
     }
+    
+    String salePriceStr = request.getParameter("salePrice");
+    if (salePriceStr != null && !salePriceStr.isEmpty()) {
+        product.setSalePrice(new BigDecimal(salePriceStr));
+    } else {
+        product.setSalePrice(null);
+    }
+    
+    String stockStr = request.getParameter("stock");
+    if (stockStr != null && !stockStr.isEmpty()) {
+        product.setStock(Integer.parseInt(stockStr));
+    } else {
+        product.setStock(0);
+    }
+    
+    String categoryIdStr = request.getParameter("categoryId");
+    if (categoryIdStr != null && !categoryIdStr.isEmpty()) {
+        product.setCategoryId(Integer.parseInt(categoryIdStr));
+    } else {
+        product.setCategoryId(0);
+    }
+    
+    product.setUvProtection("on".equals(request.getParameter("uvProtection")));
+    product.setFeatured("on".equals(request.getParameter("isFeatured")));
+    
+    return product;
+}
     
     /**
      * Xử lý upload ảnh sản phẩm vào thư mục image/anhdanhmuc

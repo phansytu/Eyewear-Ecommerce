@@ -363,83 +363,215 @@ public class ProductDAO {
     // 7. ADMIN - CRUD
     // ========================================
     
+//    public boolean addProduct(Product p) {
+//        String sql = """
+//            INSERT INTO products (name, brand, category_id, stock, price, sale_price, description, 
+//            image, is_featured, uv_protection, status, gender, frame_material, lens_type) 
+//            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//            """;
+//        
+//        try (Connection conn = DBConnect.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+//            
+//            ps.setString(1, p.getName());
+//            ps.setString(2, p.getBrand());
+//            ps.setInt(3, p.getCategoryId());
+//            ps.setInt(4, p.getStock());
+//            ps.setBigDecimal(5, p.getPrice());
+//            ps.setBigDecimal(6, p.getSalePrice());
+//            ps.setString(7, p.getDescription());
+//            ps.setString(8, p.getImage());
+//            ps.setBoolean(9, p.isFeatured());
+//            ps.setBoolean(10, p.isUvProtection());
+//            ps.setString(11, p.getStatus() != null ? p.getStatus() : "active");
+//            ps.setString(12, p.getGender());
+//            ps.setString(13, p.getFrameMaterial());
+//            ps.setString(14, p.getLensType());
+//            
+//            int rowsAffected = ps.executeUpdate();
+//            if (rowsAffected > 0) {
+//                ResultSet rs = ps.getGeneratedKeys();
+//                if (rs.next()) {
+//                    p.setId(rs.getInt(1));
+//                }
+//                System.out.println("✅ Added product: " + p.getName());
+//                return true;
+//            }
+//        } catch (SQLException e) {
+//            System.err.println("❌ addProduct: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+//    
+//    public boolean updateProduct(Product product) {
+//        String sql = """
+//            UPDATE products SET name=?, description=?, price=?, sale_price=?, stock=?, 
+//            category_id=?, brand=?, gender=?, frame_material=?, lens_type=?, 
+//            uv_protection=?, is_featured=?, image=? WHERE id=?
+//            """;
+//        
+//        try (Connection conn = DBConnect.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//            
+//            ps.setString(1, product.getName());
+//            ps.setString(2, product.getDescription());
+//            ps.setBigDecimal(3, product.getPrice());
+//            ps.setBigDecimal(4, product.getSalePrice());
+//            ps.setInt(5, product.getStock());
+//            ps.setInt(6, product.getCategoryId());
+//            ps.setString(7, product.getBrand());
+//            ps.setString(8, product.getGender());
+//            ps.setString(9, product.getFrameMaterial());
+//            ps.setString(10, product.getLensType());
+//            ps.setBoolean(11, product.isUvProtection());
+//            ps.setBoolean(12, product.isFeatured());
+//            ps.setString(13, product.getImage());
+//            ps.setInt(14, product.getId());
+//            
+//            int rows = ps.executeUpdate();
+//            System.out.println("✅ Updated " + rows + " product(s)");
+//            return rows > 0;
+//        } catch (SQLException e) {
+//            System.err.println("❌ updateProduct: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+    
+//    public boolean updateProductStatus(int productId, String status) {
+//        String sql = "UPDATE products SET status = ? WHERE id = ?";
+//        try (Connection conn = DBConnect.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//            ps.setString(1, status);
+//            ps.setInt(2, productId);
+//            int rows = ps.executeUpdate();
+//            System.out.println("✅ Updated status to " + status + " for product " + productId);
+//            return rows > 0;
+//        } catch (SQLException e) {
+//            System.err.println("❌ updateProductStatus: " + e.getMessage());
+//        }
+//        return false;
+//    }
     public boolean addProduct(Product p) {
-        String sql = """
-            INSERT INTO products (name, brand, category_id, stock, price, sale_price, description, 
-            image, is_featured, uv_protection, status, gender, frame_material, lens_type) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+    String sql = """
+        INSERT INTO products (name, brand, category_id, stock, price, sale_price, description, 
+        image, is_featured, uv_protection, status, gender, frame_material, lens_type) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
         
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
-            ps.setString(1, p.getName());
-            ps.setString(2, p.getBrand());
-            ps.setInt(3, p.getCategoryId());
-            ps.setInt(4, p.getStock());
-            ps.setBigDecimal(5, p.getPrice());
-            ps.setBigDecimal(6, p.getSalePrice());
-            ps.setString(7, p.getDescription());
-            ps.setString(8, p.getImage());
-            ps.setBoolean(9, p.isFeatured());
-            ps.setBoolean(10, p.isUvProtection());
-            ps.setString(11, p.getStatus() != null ? p.getStatus() : "active");
-            ps.setString(12, p.getGender());
-            ps.setString(13, p.getFrameMaterial());
-            ps.setString(14, p.getLensType());
-            
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected > 0) {
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    p.setId(rs.getInt(1));
-                }
-                System.out.println("✅ Added product: " + p.getName());
-                return true;
+        ps.setString(1, p.getName());
+        ps.setString(2, p.getBrand());
+        ps.setInt(3, p.getCategoryId());
+        ps.setInt(4, p.getStock());
+        ps.setBigDecimal(5, p.getPrice());
+        
+        // Xử lý sale_price: nếu null thì set price
+        BigDecimal salePrice = p.getSalePrice();
+        if (salePrice == null || salePrice.compareTo(BigDecimal.ZERO) == 0) {
+            salePrice = p.getPrice();
+        }
+        ps.setBigDecimal(6, salePrice);
+        
+        ps.setString(7, p.getDescription());
+        ps.setString(8, p.getImage());
+        ps.setBoolean(9, p.isFeatured());
+        ps.setBoolean(10, p.isUvProtection());
+        ps.setString(11, p.getStatus() != null ? p.getStatus() : "active");
+        
+        // SỬA: Chuyển đổi gender từ "Nam/Nữ/Unisex" sang "male/female/unisex"
+        String genderValue = convertGender(p.getGender());
+        ps.setString(12, genderValue);
+        
+        ps.setString(13, p.getFrameMaterial());
+        ps.setString(14, p.getLensType());
+        
+        int rowsAffected = ps.executeUpdate();
+        if (rowsAffected > 0) {
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                p.setId(rs.getInt(1));
             }
-        } catch (SQLException e) {
-            System.err.println("❌ addProduct: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("✅ Added product: " + p.getName());
+            return true;
         }
-        return false;
+    } catch (SQLException e) {
+        System.err.println("❌ addProduct: " + e.getMessage());
+        e.printStackTrace();
     }
+    return false;
+}
+
+public boolean updateProduct(Product product) {
+    String sql = """
+        UPDATE products SET name=?, description=?, price=?, sale_price=?, stock=?, 
+        category_id=?, brand=?, gender=?, frame_material=?, lens_type=?, 
+        uv_protection=?, is_featured=?, image=? WHERE id=?
+        """;
     
-    public boolean updateProduct(Product product) {
-        String sql = """
-            UPDATE products SET name=?, description=?, price=?, sale_price=?, stock=?, 
-            category_id=?, brand=?, gender=?, frame_material=?, lens_type=?, 
-            uv_protection=?, is_featured=?, image=? WHERE id=?
-            """;
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
         
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, product.getName());
-            ps.setString(2, product.getDescription());
-            ps.setBigDecimal(3, product.getPrice());
-            ps.setBigDecimal(4, product.getSalePrice());
-            ps.setInt(5, product.getStock());
-            ps.setInt(6, product.getCategoryId());
-            ps.setString(7, product.getBrand());
-            ps.setString(8, product.getGender());
-            ps.setString(9, product.getFrameMaterial());
-            ps.setString(10, product.getLensType());
-            ps.setBoolean(11, product.isUvProtection());
-            ps.setBoolean(12, product.isFeatured());
-            ps.setString(13, product.getImage());
-            ps.setInt(14, product.getId());
-            
-            int rows = ps.executeUpdate();
-            System.out.println("✅ Updated " + rows + " product(s)");
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("❌ updateProduct: " + e.getMessage());
-            e.printStackTrace();
+        ps.setString(1, product.getName());
+        ps.setString(2, product.getDescription());
+        ps.setBigDecimal(3, product.getPrice());
+        
+        // Xử lý sale_price
+        BigDecimal salePrice = product.getSalePrice();
+        if (salePrice == null || salePrice.compareTo(BigDecimal.ZERO) == 0) {
+            salePrice = product.getPrice();
         }
-        return false;
+        ps.setBigDecimal(4, salePrice);
+        
+        ps.setInt(5, product.getStock());
+        ps.setInt(6, product.getCategoryId());
+        ps.setString(7, product.getBrand());
+        
+        // SỬA: Chuyển đổi gender
+        String genderValue = convertGender(product.getGender());
+        ps.setString(8, genderValue);
+        
+        ps.setString(9, product.getFrameMaterial());
+        ps.setString(10, product.getLensType());
+        ps.setBoolean(11, product.isUvProtection());
+        ps.setBoolean(12, product.isFeatured());
+        ps.setString(13, product.getImage());
+        ps.setInt(14, product.getId());
+        
+        int rows = ps.executeUpdate();
+        System.out.println("✅ Updated " + rows + " product(s)");
+        return rows > 0;
+    } catch (SQLException e) {
+        System.err.println("❌ updateProduct: " + e.getMessage());
+        e.printStackTrace();
     }
-    
-    public boolean updateProductStatus(int productId, String status) {
+    return false;
+}
+
+/**
+ * Chuyển đổi gender từ dạng hiển thị sang dạng lưu trong database
+ * @param displayGender "Nam", "Nữ", "Unisex"
+ * @return "male", "female", "unisex"
+ */
+private String convertGender(String displayGender) {
+    if (displayGender == null || displayGender.isEmpty()) {
+        return "unisex";
+    }
+    switch (displayGender) {
+        case "Nam":
+            return "male";
+        case "Nữ":
+            return "female";
+        case "Unisex":
+            return "unisex";
+        default:
+            return "unisex";
+    }
+}
+ public boolean updateProductStatus(int productId, String status) {
         String sql = "UPDATE products SET status = ? WHERE id = ?";
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -453,7 +585,6 @@ public class ProductDAO {
         }
         return false;
     }
-    
     public boolean deleteProduct(int id) {
         String sql = "UPDATE products SET status = 'deleted' WHERE id = ?";
         try (Connection conn = DBConnect.getConnection();

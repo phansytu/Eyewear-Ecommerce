@@ -117,7 +117,8 @@ public class Product {
     public int getDiscountPercent() {
         if (price != null && salePrice != null && price.compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal discount = price.subtract(salePrice);
-            BigDecimal percent = discount.multiply(BigDecimal.valueOf(100)).divide(price, 0, BigDecimal.ROUND_HALF_UP);
+            BigDecimal percent = discount.multiply(BigDecimal.valueOf(100))
+        .divide(price, 0, java.math.RoundingMode.HALF_UP);
             return percent.intValue();
         }
         return 0;
@@ -133,6 +134,16 @@ public class Product {
         if (averageRating == null) return false;
         return (averageRating - getFullStars()) >= 0.5;
     }
+    // Trong Product.java, thêm method để lấy gender dạng hiển thị
+public String getGenderDisplay() {
+    if (gender == null) return "Unisex";
+    switch (gender) {
+        case "male": return "Nam";
+        case "female": return "Nữ";
+        case "unisex": return "Unisex";
+        default: return "Unisex";
+    }
+}
     
     @Override
     public String toString() {
