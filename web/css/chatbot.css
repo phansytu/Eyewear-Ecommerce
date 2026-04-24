@@ -1,0 +1,28 @@
+/* ============================================
+   FILE: css/chatbot.css
+   CHỈ XỬ LÝ CHATBOT - KHÔNG CSS GIAO DIỆN
+   (Tránh conflict hoàn toàn với style cũ)
+   ============================================ */
+
+/* 
+   LƯU Ý: 
+   File này chỉ dành cho JavaScript logic.
+   KHÔNG có CSS ở đây để tránh xung đột.
+   Tất cả style đã được chuyển sang chatbot-news.css
+*/
+
+/* 
+   Nếu bạn muốn thêm CSS đặc biệt cho chatbot,
+   hãy đặt tên class có prefix 'cb-' để tránh conflict
+   Ví dụ:
+   .cb-custom-class { ... }
+*/
+
+/* Chỉ giữ lại các style tối thiểu nếu cần */
+.cb-hidden {
+    display: none !important;
+}
+
+.cb-visible {
+    display: block !important;
+}

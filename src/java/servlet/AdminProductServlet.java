@@ -243,7 +243,7 @@ public class AdminProductServlet extends HttpServlet {
         
         Product product = extractProductFromRequest(request);
         
-        // Xử lý upload ảnh
+        // Xử lý upload ảnh vào thư mục image/anhdanhmuc
         String imagePath = handleImageUpload(request, null);
         product.setImage(imagePath);
         product.setStatus("active");
@@ -275,7 +275,7 @@ public class AdminProductServlet extends HttpServlet {
         // Lấy ảnh cũ
         String existingImage = request.getParameter("existingImage");
         
-        // Xử lý upload ảnh mới (nếu có)
+        // Xử lý upload ảnh mới (nếu có) vào thư mục image/anhdanhmuc
         String imagePath = handleImageUpload(request, existingImage);
         product.setImage(imagePath);
         
@@ -328,7 +328,9 @@ public class AdminProductServlet extends HttpServlet {
     }
     
     /**
-     * Xử lý upload ảnh sản phẩm
+     * Xử lý upload ảnh sản phẩm vào thư mục image/anhdanhmuc
+     * @param request HttpServletRequest
+     * @param existingImage Đường dẫn ảnh cũ (nếu có)
      * @return Đường dẫn ảnh đã lưu, hoặc đường dẫn ảnh cũ nếu không upload mới
      */
     private String handleImageUpload(HttpServletRequest request, String existingImage) 
@@ -338,32 +340,40 @@ public class AdminProductServlet extends HttpServlet {
         
         // Nếu không có file mới, trả về ảnh cũ
         if (filePart == null || filePart.getSize() == 0) {
+            // Nếu không có ảnh cũ và cũng không upload ảnh mới, dùng ảnh mặc định
+            if (existingImage == null || existingImage.isEmpty()) {
+                return "/image/anhdanhmuc/no-image.png";
+            }
             return existingImage;
         }
         
         // Lấy tên file gốc
-        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+        String originalFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
         String fileExtension = "";
-        int dotIndex = fileName.lastIndexOf(".");
+        int dotIndex = originalFileName.lastIndexOf(".");
         if (dotIndex > 0) {
-            fileExtension = fileName.substring(dotIndex);
+            fileExtension = originalFileName.substring(dotIndex);
         }
         
         // Tạo tên file unique để tránh trùng
-        String newFileName = UUID.randomUUID().toString() + fileExtension;
+        String newFileName = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + fileExtension;
         
-        // Đường dẫn thư mục upload
-        String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "products";
+        // Đường dẫn thư mục upload: webapp/image/anhdanhmuc
+        String uploadPath = getServletContext().getRealPath("") + File.separator + "image" + File.separator + "anhdanhmuc";
         File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
+            boolean created = uploadDir.mkdirs();
+            System.out.println("📁 Tạo thư mục upload: " + uploadPath + " - Thành công: " + created);
         }
         
         // Lưu file
         String filePath = uploadPath + File.separator + newFileName;
         filePart.write(filePath);
         
+        System.out.println("✅ File uploaded to: " + filePath);
+        System.out.println("✅ File name: " + newFileName);
+        
         // Trả về đường dẫn tương đối để lưu vào database
-        return "/uploads/products/" + newFileName;
+        return "/image/anhdanhmuc/" + newFileName;
     }
 }

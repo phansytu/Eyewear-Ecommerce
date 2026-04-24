@@ -325,24 +325,27 @@
             <!-- Gallery Column -->
             <div class="col-md-5">
                 <div class="sticky-top" style="top: 80px;">
-                    <div class="main-image mb-3">
-                        <img src="${root}${product.image}" id="mainProductImage" class="img-fluid" alt="${product.name}"
-                             onerror="this.src='${root}/image/anhdanhmuc/no-image.png'">
-                    </div>
-                    <div class="row g-2">
-                        <div class="col-3">
-                            <img src="${root}${product.image}" class="thumbnail-img active" 
-                                 onclick="changeMainImage('${root}${product.image}', this)">
-                        </div>
-                        <c:if test="${not empty product.images}">
-                            <c:forEach var="img" items="${product.images}">
-                                <div class="col-3">
-                                    <img src="${root}${img.imageUrl}" class="thumbnail-img" 
-                                         onclick="changeMainImage('${root}${img.imageUrl}', this)">
-                                </div>
-                            </c:forEach>
-                        </c:if>
-                    </div>
+                    <!-- Ảnh chính -->
+<div class="main-image mb-3">
+    <img src="${root}${product.image}" id="mainProductImage" class="img-fluid w-100" alt="${product.name}"
+         onerror="this.src='${root}/image/anhdanhmuc/no-image.png'">
+</div>
+
+<!-- Ảnh thumbnail -->
+<div class="row g-2">
+    <div class="col-3">
+        <img src="${root}${product.image}" class="thumbnail-img active" 
+             onclick="changeMainImage('${root}${product.image}', this)">
+    </div>
+    <c:if test="${not empty product.images}">
+        <c:forEach var="img" items="${product.images}">
+            <div class="col-3">
+                <img src="${root}${img.imageUrl}" class="thumbnail-img" 
+                     onclick="changeMainImage('${root}${img.imageUrl}', this)">
+            </div>
+        </c:forEach>
+    </c:if>
+</div>
                 </div>
             </div>
             

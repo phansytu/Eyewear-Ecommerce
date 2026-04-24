@@ -1,0 +1,278 @@
+/* ============================================
+   FILE: css/chatbot-news.css
+   Chatbot & News Floating Widgets
+   KHÔNG XUNG ĐỘT với style cũ
+   ============================================ */
+
+/* Container chính - Sử dụng lớp riêng biệt */
+.chatbot-news-floating {
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Widget chung - Prefix chatbot-news để tránh conflict */
+.chatbot-news-widget {
+    width: 280px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.chatbot-news-widget:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+}
+
+/* Header widget */
+.chatbot-news-widget .cn-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chatbot-news-widget .cn-header i {
+    font-size: 24px;
+    margin: 0;
+}
+
+.chatbot-news-widget .cn-header .cn-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.chatbot-news-widget .cn-header .cn-subtitle {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+/* Nội dung widget */
+.chatbot-news-widget .cn-content {
+    padding: 0 16px 16px 16px;
+}
+
+/* Chatbot Widget */
+.chatbot-news-widget.cn-chatbot .cn-header {
+    background: linear-gradient(135deg, #1A94FF, #0d6efd);
+    color: white;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-quick-reply-btn {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    color: #333;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-quick-reply-btn:hover {
+    background: #1A94FF;
+    color: white;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-chat-input-area {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-chat-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 12px;
+    outline: none;
+    font-family: inherit;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-chat-input:focus {
+    border-color: #1A94FF;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-chat-send {
+    background: #1A94FF;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chatbot-news-widget.cn-chatbot .cn-chat-send:hover {
+    background: #0b5ed7;
+}
+
+/* News Widget */
+.chatbot-news-widget.cn-news .cn-header {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+}
+
+.chatbot-news-widget.cn-news .cn-news-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chatbot-news-widget.cn-news .cn-news-item:hover {
+    background: #fafafa;
+    margin: 0 -5px;
+    padding: 10px 5px;
+}
+
+.chatbot-news-widget.cn-news .cn-news-item:last-child {
+    border-bottom: none;
+}
+
+.chatbot-news-widget.cn-news .cn-news-icon {
+    width: 36px;
+    height: 36px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    color: #ff6b6b;
+}
+
+.chatbot-news-widget.cn-news .cn-news-content {
+    flex: 1;
+}
+
+.chatbot-news-widget.cn-news .cn-news-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: #333;
+    line-height: 1.3;
+}
+
+.chatbot-news-widget.cn-news .cn-news-desc {
+    font-size: 11px;
+    color: #999;
+    line-height: 1.2;
+}
+
+.chatbot-news-widget.cn-news .cn-news-badge {
+    background: #ff6b6b;
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    display: inline-block;
+}
+
+.chatbot-news-widget.cn-news .cn-view-all {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    background: #f8f9fa;
+    margin-top: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #1A94FF;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.chatbot-news-widget.cn-news .cn-view-all:hover {
+    background: #e9ecef;
+}
+
+/* Deal badge */
+.chatbot-news-widget .cn-deal-badge {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+    transform: rotate(-15deg);
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+    z-index: 10;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .chatbot-news-floating {
+        right: 15px;
+        bottom: 20px;
+    }
+    
+    .chatbot-news-widget {
+        width: 260px;
+    }
+    
+    .chatbot-news-widget.cn-news .cn-news-title {
+        font-size: 12px;
+    }
+    
+    .chatbot-news-widget.cn-news .cn-news-desc {
+        font-size: 10px;
+    }
+}
+
+/* Animation khi mở rộng */
+.chatbot-news-widget.cn-expanded .cn-content {
+    display: block;
+}
+
+.chatbot-news-widget .cn-content {
+    display: none;
+}
+
+.chatbot-news-widget.cn-expanded .cn-content {
+    display: block;
+    animation: cnSlideDown 0.3s ease;
+}
+
+@keyframes cnSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

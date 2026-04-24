@@ -13,7 +13,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    
+    <!-- THÊM CSS MỚI - KHÔNG XUNG ĐỘT -->
+    <link rel="stylesheet" href="css/chatbot-news.css">
 </head>
 <body>
 
@@ -337,44 +338,93 @@
             </c:if>
         </div>
     </div>
+            
+            
 </main>
+            <!-- Floating Widgets: Chatbot & News -->
+<div class="floating-widgets">
+    
+    <!-- Chatbot Widget -->
+    <div class="widget-item chatbot-widget" id="chatbotWidget">
+        <div class="deal-badge">✨ AI</div>
+        <div class="widget-header">
+            <i class="fas fa-robot"></i>
+            <div>
+                <div class="widget-title">Trợ lý AI</div>
+                <div class="widget-subtitle">Hỗ trợ 24/7</div>
+            </div>
+        </div>
+        <div class="widget-content">
+            <div class="quick-replies">
+                <button class="quick-reply-btn" data-msg="Xem sản phẩm">🛍️ Xem sản phẩm</button>
+                <button class="quick-reply-btn" data-msg="Bảng giá">💰 Bảng giá</button>
+                <button class="quick-reply-btn" data-msg="Chính sách">📜 Chính sách</button>
+                <button class="quick-reply-btn" data-msg="Liên hệ">📞 Liên hệ</button>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn...">
+                <button class="chat-send" id="chatSend">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- News Widget -->
+    <div class="widget-item news-widget" id="newsWidget">
+        <div class="deal-badge">🔥 HOT</div>
+        <div class="widget-header">
+            <i class="fas fa-bullhorn"></i>
+            <div>
+                <div class="widget-title">Tin mới & Khuyến mãi</div>
+                <div class="widget-subtitle">Cập nhật liên tục</div>
+            </div>
+        </div>
+        <div class="widget-content">
+            <div class="news-item">
+                <div class="news-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="news-content">
+                    <div class="news-title">
+                        Deal siêu wow! 
+                        <span class="news-badge">Mới</span>
+                    </div>
+                    <div class="news-desc">Coupon đến 30% - Sức khỏe dồi dào</div>
+                </div>
+            </div>
+            <div class="news-item">
+                <div class="news-icon">
+                    <i class="fas fa-tag"></i>
+                </div>
+                <div class="news-content">
+                    <div class="news-title">Top deal - Siêu rẻ</div>
+                    <div class="news-desc">Giảm giá sốc hàng ngàn sản phẩm</div>
+                </div>
+            </div>
+            <div class="news-item">
+                <div class="news-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="news-content">
+                    <div class="news-title">Top sách đáng đọc</div>
+                    <div class="news-desc">Ưu đãi lên đến 50%</div>
+                </div>
+            </div>
+            <a href="#" class="view-all">Xem tất cả <i class="fas fa-chevron-right"></i></a>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Import widget component -->
+<jsp:include page="/chatbot.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Xử lý sort
-    const sortSelect = document.getElementById('sortSelect');
-    const sortInput = document.getElementById('sortInput');
-    const filterForm = document.getElementById('filterForm');
-    
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            sortInput.value = this.value;
-            filterForm.submit();
-        });
-    }
-    
-    // Xử lý pagination
-    document.querySelectorAll('.page-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const page = this.dataset.page;
-            if (page && !this.parentElement.classList.contains('disabled')) {
-                const pageInput = document.createElement('input');
-                pageInput.type = 'hidden';
-                pageInput.name = 'page';
-                pageInput.value = page;
-                filterForm.appendChild(pageInput);
-                filterForm.submit();
-            }
-        });
-    });
-    
-    // Tự động submit khi thay đổi radio
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            filterForm.submit();
-        });
-    });
-</script>
+<script src="${root}/js/home.js"></script>
+<!-- KHÔNG CẦN thêm chatbot.js nữa vì script đã có trong JSP -->
+</body>
+</html>
+
 </body>
 </html>
