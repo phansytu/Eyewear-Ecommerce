@@ -69,8 +69,9 @@ public class CartDAO {
     // Lấy danh sách items trong giỏ hàng (kèm thông tin sản phẩm)
     private List<CartItem> getCartItems(int cartId) {
         List<CartItem> items = new ArrayList<>();
-        String sql = "SELECT ci.*, p.name as product_name, p.image_url as product_image, " +
-                     "COALESCE(pv.price, p.price) as price, " +
+        // SỬA: p.image_url -> p.image (đúng với bảng products)
+        String sql = "SELECT ci.*, p.name as product_name, p.image as product_image, " +
+                     "COALESCE(pv.price, p.sale_price, p.price) as price, " +
                      "CONCAT(pv.color, ' - ', pv.size) as variant_name " +
                      "FROM cart_items ci " +
                      "JOIN products p ON ci.product_id = p.id " +
@@ -92,7 +93,7 @@ public class CartDAO {
                 item.setVariantId(rs.getObject("variant_id", Integer.class));
                 item.setQuantity(rs.getInt("quantity"));
                 item.setProductName(rs.getString("product_name"));
-                item.setProductImage(rs.getString("product_image"));
+                item.setProductImage(rs.getString("product_image"));  // SỬA: getString("product_image")
                 item.setPrice(rs.getDouble("price"));
                 item.setVariantName(rs.getString("variant_name"));
                 items.add(item);
