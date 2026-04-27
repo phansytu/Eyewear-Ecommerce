@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ProductDAO {
     
@@ -289,24 +290,27 @@ public class ProductDAO {
             params.add(frameMaterial);
         }
         
-        // Sắp xếp
-        switch (sort) {
-            case "price_asc":
-                sql.append(" ORDER BY p.sale_price ASC");
-                break;
-            case "price_desc":
-                sql.append(" ORDER BY p.sale_price DESC");
-                break;
-            case "name_asc":
-                sql.append(" ORDER BY p.name ASC");
-                break;
-            case "best_seller":
-                sql.append(" ORDER BY p.sold_quantity DESC");
-                break;
-            default: // newest
-                sql.append(" ORDER BY p.created_at DESC");
-                break;
-        }
+        
+switch (sort) {
+    case "price_asc":
+        sql.append(" ORDER BY p.sale_price ASC");
+        break;
+    case "price_desc":
+        sql.append(" ORDER BY p.sale_price DESC");
+        break;
+    case "name_asc":
+        sql.append(" ORDER BY p.name ASC");
+        break;
+    case "rating_desc":  // THÊM: Đánh giá cao nhất (4 sao trở lên)
+        sql.append(" ORDER BY p.average_rating DESC, p.total_reviews DESC");
+        break;
+    case "best_seller":  // THÊM: Bán chạy
+        sql.append(" ORDER BY p.sold_quantity DESC, p.total_reviews DESC");
+        break;
+    default: // newest
+        sql.append(" ORDER BY p.created_at DESC");
+        break;
+}
         
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -765,4 +769,142 @@ private String convertGender(String displayGender) {
         p.setLensType(rs.getString("lens_type"));
         return p;
     }
+    /**
+ * Tìm kiếm sản phẩm nâng cao với nhiều bộ lọc (có rating)
+ */
+public List<Product> searchProductsAdvanced(String keyword, String categoryId, String minPrice, 
+                                             String maxPrice, String gender, String frameMaterial, 
+                                             String rating, String sort) {
+    List<Product> products = new ArrayList<>();
+    StringBuilder sql = new StringBuilder("""
+        SELECT p.*, c.name as category_name,
+               COALESCE(p.average_rating, 0) as average_rating,
+               COALESCE(p.total_reviews, 0) as total_reviews
+        FROM products p 
+        LEFT JOIN categories c ON p.category_id = c.id 
+        WHERE p.status = 'active'
+        """);
+    
+    List<Object> params = new ArrayList<>();
+    
+    // Tìm kiếm theo từ khóa
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        sql.append(" AND (p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)");
+        String searchPattern = "%" + keyword.trim() + "%";
+        params.add(searchPattern);
+        params.add(searchPattern);
+        params.add(searchPattern);
+    }
+    
+    // Lọc theo danh mục
+    if (categoryId != null && !categoryId.isEmpty() && !categoryId.equals("0")) {
+        sql.append(" AND p.category_id = ?");
+        params.add(Integer.parseInt(categoryId));
+    }
+    
+    // Lọc theo giá
+    if (minPrice != null && !minPrice.isEmpty()) {
+        sql.append(" AND p.sale_price >= ?");
+        params.add(new BigDecimal(minPrice));
+    }
+    if (maxPrice != null && !maxPrice.isEmpty()) {
+        sql.append(" AND p.sale_price <= ?");
+        params.add(new BigDecimal(maxPrice));
+    }
+    
+    // Lọc theo giới tính
+    if (gender != null && !gender.isEmpty() && !gender.equals("all")) {
+        sql.append(" AND p.gender = ?");
+        params.add(gender);
+    }
+    
+    // Lọc theo chất liệu gọng
+    if (frameMaterial != null && !frameMaterial.isEmpty() && !frameMaterial.equals("all")) {
+        sql.append(" AND p.frame_material = ?");
+        params.add(frameMaterial);
+    }
+    
+    // Lọc theo đánh giá (thêm mới)
+    if (rating != null && !rating.isEmpty()) {
+        sql.append(" AND p.average_rating >= ?");
+        params.add(Double.parseDouble(rating));
+    }
+    
+    // Sắp xếp
+    switch (sort) {
+        case "price_asc":
+            sql.append(" ORDER BY p.sale_price ASC");
+            break;
+        case "price_desc":
+            sql.append(" ORDER BY p.sale_price DESC");
+            break;
+        case "name_asc":
+            sql.append(" ORDER BY p.name ASC");
+            break;
+        case "rating_desc":
+            sql.append(" ORDER BY p.average_rating DESC, p.total_reviews DESC");
+            break;
+        case "best_seller":
+            sql.append(" ORDER BY p.sold_quantity DESC, p.total_reviews DESC");
+            break;
+        default: // newest
+            sql.append(" ORDER BY p.created_at DESC");
+            break;
+    }
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        
+        for (int i = 0; i < params.size(); i++) {
+            ps.setObject(i + 1, params.get(i));
+        }
+        
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Product product = extractProductBasic(rs);
+            product.setAverageRating(rs.getDouble("average_rating"));
+            product.setTotalReviews(rs.getInt("total_reviews"));
+            products.add(product);
+        }
+    } catch (SQLException e) {
+        System.err.println("❌ searchProductsAdvanced: " + e.getMessage());
+    }
+    return products;
+}
+/**
+ * Cập nhật số lượng đã bán khi có đơn hàng thành công
+ * @param productId ID sản phẩm
+ * @param quantity Số lượng đã bán
+ * @return true nếu cập nhật thành công
+ */
+public boolean updateProductSoldQuantity(int productId, int quantity) {
+    String sql = "UPDATE products SET sold_quantity = COALESCE(sold_quantity, 0) + ? WHERE id = ?";
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, quantity);
+        ps.setInt(2, productId);
+        int rows = ps.executeUpdate();
+        System.out.println("✅ Updated sold_quantity for product " + productId + " +" + quantity);
+        return rows > 0;
+    } catch (SQLException e) {
+        System.err.println("❌ updateProductSoldQuantity: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
+}
+
+/**
+ * Cập nhật số lượng đã bán cho nhiều sản phẩm cùng lúc (khi checkout)
+ * @param items Map<productId, quantity>
+ * @return true nếu tất cả cập nhật thành công
+ */
+public boolean updateMultipleSoldQuantities(Map<Integer, Integer> items) {
+    boolean allSuccess = true;
+    for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
+        boolean success = updateProductSoldQuantity(entry.getKey(), entry.getValue());
+        if (!success) allSuccess = false;
+    }
+    return allSuccess;
+}
 }

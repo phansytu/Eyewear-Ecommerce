@@ -707,5 +707,22 @@ public List<Object[]> getMonthlyRevenue(int months) {
     }
     return monthlyRevenue;
 }
+// Khi đơn hàng được xác nhận là 'delivered'
+public boolean confirmOrderDelivery(int orderId) {
+    // Cập nhật trạng thái đơn hàng
+    boolean updated = updateOrderStatus(orderId, "delivered");
+    
+    if (updated) {
+        // Lấy danh sách sản phẩm trong đơn hàng
+        List<OrderDetail> details = getOrderDetailsByOrderId(orderId);
+        
+        // Cập nhật sold_quantity cho từng sản phẩm
+        ProductDAO productDAO = new ProductDAO();
+        for (OrderDetail detail : details) {
+            productDAO.updateProductSoldQuantity(detail.getProductId(), detail.getQuantity());
+        }
+    }
+    return updated;
+}
 
 }

@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="root" value="${pageContext.request.contextPath}"/>
-<link rel="stylesheet" href="css/style.css">
 
 <!-- Header -->
 <div class="main-header">
@@ -54,10 +53,12 @@
                             </a>
                         </c:otherwise>
                     </c:choose>
+                    <!-- GIỎ HÀNG VỚI BADGE HIỂN THỊ SỐ LƯỢNG -->
                     <a href="${root}/cart" class="header-action position-relative">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Giỏ hàng</span>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">0</span>
+                        <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                              style="font-size: 10px; display: none;">0</span>
                     </a>
                 </div>
             </div>
@@ -69,6 +70,7 @@
 <div class="navbar-menu">
     <div class="container-fluid px-4">
         <ul class="navbar-list">
+            <li><a href="${root}/home">Trang chủ</a></li>
             <li><a href="${root}/search?categoryId=18">Gọng kính</a></li>
             <li><a href="${root}/search?categoryId=19">Kính râm</a></li>
             <li><a href="${root}/search?categoryId=20">Kính chống ánh sáng xanh</a></li>
@@ -78,3 +80,30 @@
         </ul>
     </div>
 </div>
+
+<script>
+    // Khai báo contextPath toàn cục
+    window.contextPath = '${pageContext.request.contextPath}';
+    const contextPath = window.contextPath;
+    
+    // Hàm cập nhật số lượng giỏ hàng (dùng chung)
+    function updateCartCount() {
+        fetch(contextPath + '/cart?action=count')
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('cartCount');
+                if (badge) {
+                    const count = data.count || 0;
+                    badge.textContent = count;
+                    badge.style.display = count > 0 ? 'inline-block' : 'none';
+                }
+            })
+            .catch(err => console.error('Error updating cart count:', err));
+    }
+    
+    // Cập nhật số lượng khi trang load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCount();
+    });
+</script>
+<script src="${root}/js/giohangcount.js" defer></script>

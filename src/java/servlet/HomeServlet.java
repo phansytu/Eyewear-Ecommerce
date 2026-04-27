@@ -15,8 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(name = "HomeServlet", urlPatterns = {"/home"})
 public class HomeServlet extends HttpServlet {
     
-    private ProductDAO productDAO = new ProductDAO();
-    private CategoryDAO categoryDAO = new CategoryDAO();
+    private final ProductDAO productDAO = new ProductDAO();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,6 +29,7 @@ public class HomeServlet extends HttpServlet {
             String gender = request.getParameter("gender");
             String frameMaterial = request.getParameter("frameMaterial");
             String sort = request.getParameter("sort");
+            String rating = request.getParameter("rating");
             String pageStr = request.getParameter("page");
             
             // Xử lý giá trị null
@@ -36,7 +37,20 @@ public class HomeServlet extends HttpServlet {
             if (maxPrice == null || maxPrice.isEmpty()) maxPrice = null;
             if (gender == null || gender.isEmpty()) gender = null;
             if (frameMaterial == null || frameMaterial.isEmpty()) frameMaterial = null;
-            if (sort == null || sort.isEmpty()) sort = "newest";
+            if (rating == null || rating.isEmpty()) rating = null;
+            
+            // Validate sort - chỉ chấp nhận các giá trị hợp lệ
+            String[] validSorts = {"newest", "price_asc", "price_desc", "name_asc", "rating_desc", "best_seller"};
+            boolean isValidSort = false;
+            for (String s : validSorts) {
+                if (s.equals(sort)) {
+                    isValidSort = true;
+                    break;
+                }
+            }
+            if (sort == null || sort.isEmpty() || !isValidSort) {
+                sort = "newest";
+            }
             
             int page = 1;
             int pageSize = 12;
@@ -48,10 +62,11 @@ public class HomeServlet extends HttpServlet {
                 }
             }
             
-            // Lấy danh sách sản phẩm theo bộ lọc (KHÔNG phân trang ở đây)
-            List<Product> allProducts = productDAO.searchProductsAdvanced(
-                null, null, minPrice, maxPrice, gender, frameMaterial, sort
-            );
+            // Lấy danh sách sản phẩm theo bộ lọc
+            // Thay vì gọi phương thức 8 tham số, hãy gọi phương thức có sẵn
+List<Product> allProducts = productDAO.searchProductsAdvanced(
+    null, null, minPrice, maxPrice, gender, frameMaterial, sort
+);
             
             // Tính toán phân trang
             int totalProducts = allProducts.size();
@@ -93,6 +108,7 @@ public class HomeServlet extends HttpServlet {
             request.setAttribute("selectedMaxPrice", maxPrice);
             request.setAttribute("selectedGender", gender);
             request.setAttribute("selectedFrameMaterial", frameMaterial);
+            request.setAttribute("selectedRating", rating);
             request.setAttribute("selectedSort", sort);
             
             // Forward to JSP

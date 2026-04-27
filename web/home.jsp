@@ -17,82 +17,8 @@
     <link rel="stylesheet" href="css/chatbot-news.css">
 </head>
 <body>
+    <jsp:include page="/WEB-INF/includes/header.jsp" />
 
-<!-- Header -->
-<div class="main-header">
-    <div class="container-fluid px-4">
-        <div class="row align-items-center">
-            <div class="col-md-3">
-                <a href="${root}/home" class="logo">
-                    TuKhanhHuy
-                    <span>Kính mắt chính hãng</span>
-                </a>
-            </div>
-            <div class="col-md-6">
-                <div class="search-wrapper">
-                    <form action="${root}/search" method="GET">
-                        <div class="search-box">
-                            <input type="text" name="keyword" placeholder="Bạn tìm gì hôm nay?" value="<c:out value='${param.keyword}'/>">
-                            <button type="submit">Tìm kiếm</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="header-actions">
-                    <a href="${root}/home" class="header-action">
-                        <i class="fas fa-home"></i>
-                        <span>Trang chủ</span>
-                    </a>
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.user}">
-                            <div class="dropdown">
-                                <a href="#" class="header-action" data-bs-toggle="dropdown">
-                                    <i class="far fa-user-circle"></i>
-                                    <span>${fn:substring(sessionScope.user.full_name, 0, 10)}</span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="${root}/profile">Hồ sơ của tôi</a></li>
-                                    <c:if test="${sessionScope.user.role eq 'admin'}">
-                                        <li><a class="dropdown-item" href="${root}/admin/dashboard">Quản trị</a></li>
-                                    </c:if>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="${root}/logout">Đăng xuất</a></li>
-                                </ul>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <a href="${root}/login" class="header-action">
-                                <i class="far fa-smile"></i>
-                                <span>Đăng nhập</span>
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
-                    <a href="${root}/cart" class="header-action position-relative">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Giỏ hàng</span>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">0</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Navbar Menu -->
-<div class="navbar-menu">
-    <div class="container-fluid px-4">
-        <ul class="navbar-list">
-            <li><a href="${root}/home">Trang chủ</a></li>
-            <li><a href="${root}/search?categoryId=18">Gọng kính</a></li>
-            <li><a href="${root}/search?categoryId=19">Kính râm</a></li>
-            <li><a href="${root}/search?categoryId=20">Kính chống ánh sáng xanh</a></li>
-            <li><a href="${root}/search?categoryId=21">Tròng kính</a></li>
-            <li><a href="${root}/search?categoryId=22">Kính áp tròng</a></li>
-            <li><a href="${root}/search?categoryId=23">Phụ kiện</a></li>
-        </ul>
-    </div>
-</div>
 
 <!-- Main Content -->
 <main class="container-fluid px-4 py-4">
@@ -250,12 +176,14 @@
                 <h2 class="section-title">Tất cả sản phẩm</h2>
                 <div class="sort-wrapper">
                     <span class="sort-label">Sắp xếp:</span>
-                    <select class="sort-select" id="sortSelect">
-                        <option value="newest" ${param.sort == 'newest' ? 'selected' : ''}>Mới nhất</option>
-                        <option value="price_asc" ${param.sort == 'price_asc' ? 'selected' : ''}>Giá thấp → cao</option>
-                        <option value="price_desc" ${param.sort == 'price_desc' ? 'selected' : ''}>Giá cao → thấp</option>
-                        <option value="name_asc" ${param.sort == 'name_asc' ? 'selected' : ''}>Tên A → Z</option>
-                    </select>
+<select class="sort-select" id="sortSelect">
+    <option value="newest" ${param.sort == 'newest' ? 'selected' : ''}>Mới nhất</option>
+    <option value="best_seller" ${param.sort == 'best_seller' ? 'selected' : ''}>Bán chạy nhất</option>
+    <option value="rating_desc" ${param.sort == 'rating_desc' ? 'selected' : ''}>Đánh giá cao nhất</option>
+    <option value="price_asc" ${param.sort == 'price_asc' ? 'selected' : ''}>Giá thấp → cao</option>
+    <option value="price_desc" ${param.sort == 'price_desc' ? 'selected' : ''}>Giá cao → thấp</option>
+    <option value="name_asc" ${param.sort == 'name_asc' ? 'selected' : ''}>Tên A → Z</option>
+</select>
                 </div>
             </div>
             
@@ -342,9 +270,9 @@
             
 </main>
             <!-- Floating Widgets: Chatbot & News -->
-<div class="floating-widgets">
+<!--<div class="floating-widgets">
     
-    <!-- Chatbot Widget -->
+     Chatbot Widget 
     <div class="widget-item chatbot-widget" id="chatbotWidget">
         <div class="deal-badge">✨ AI</div>
         <div class="widget-header">
@@ -370,7 +298,7 @@
         </div>
     </div>
     
-    <!-- News Widget -->
+     News Widget 
     <div class="widget-item news-widget" id="newsWidget">
         <div class="deal-badge">🔥 HOT</div>
         <div class="widget-header">
@@ -415,13 +343,14 @@
         </div>
     </div>
     
-</div>
+</div>-->
 
-<!-- Import widget component -->
-<jsp:include page="/chatbot.jsp" />
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="${root}/js/home.js"></script>
+<script src="${root}/js/giohangcount.js"></script>
+<!--<script src="${root}/js/cart.js"></script>-->
 <!-- KHÔNG CẦN thêm chatbot.js nữa vì script đã có trong JSP -->
 </body>
 </html>
