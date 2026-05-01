@@ -243,72 +243,10 @@
     </style>
 </head>
 <body>
-
-<!-- Header -->
-<div class="main-header">
-    <div class="container-fluid px-4">
-        <div class="row align-items-center">
-            <div class="col-md-3">
-                <a href="${root}/home" class="logo">
-                    TuKhanhHuy
-                    <span>Kính mắt chính hãng</span>
-                </a>
-            </div>
-            <div class="col-md-6">
-                <div class="search-wrapper">
-                    <form action="${root}/search" method="GET">
-                        <div class="search-box">
-                            <input type="text" name="keyword" placeholder="Bạn tìm gì hôm nay?" value="<c:out value='${param.keyword}'/>">
-                            <button type="submit">Tìm kiếm</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="header-actions">
-                    <a href="${root}/home" class="header-action">
-                        <i class="fas fa-home"></i>
-                        <span>Trang chủ</span>
-                    </a>
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.user}">
-                            <a href="${root}/profile" class="header-action">
-                                <i class="far fa-user-circle"></i>
-                                <span>${fn:substring(sessionScope.user.full_name, 0, 10)}</span>
-                            </a>
-                        </c:when>
-                        <c:otherwise>
-                            <a href="${root}/login" class="header-action">
-                                <i class="far fa-smile"></i>
-                                <span>Đăng nhập</span>
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
-                    <a href="${root}/cart" class="header-action position-relative">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Giỏ hàng</span>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">0</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Navbar -->
-<div class="navbar-menu">
-    <div class="container-fluid px-4">
-        <ul class="navbar-list">
-            <li><a href="${root}/home">Trang chủ</a></li>
-            <li><a href="${root}/search?categoryId=18">Gọng kính</a></li>
-            <li><a href="${root}/search?categoryId=19">Kính râm</a></li>
-            <li><a href="${root}/search?categoryId=20">Kính chống ánh sáng xanh</a></li>
-            <li><a href="${root}/search?categoryId=21">Tròng kính</a></li>
-            <li><a href="${root}/search?categoryId=22">Kính áp tròng</a></li>
-            <li><a href="${root}/search?categoryId=23">Phụ kiện</a></li>
-        </ul>
-    </div>
-</div>
+<header>
+    <!-- Cuối body, trước thẻ đóng body -->
+<jsp:include page="/WEB-INF/includes/header.jsp" />
+</header>
 
 <main class="container py-4">
     <c:if test="${empty product}">
@@ -492,7 +430,11 @@
         </div>
     </c:if>
 </main>
+<jsp:include page="/WEB-INF/includes/chatbot.jsp" />
 
+<footer>
+<jsp:include page="/WEB-INF/includes/footer.jsp" />
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     let selectedVariantId = null;
@@ -635,5 +577,6 @@ document.addEventListener('DOMContentLoaded', loadCartCount);
             .catch(error => console.error('Error:', error));
     }
 </script>
+
 </body>
 </html>

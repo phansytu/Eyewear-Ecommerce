@@ -107,3 +107,6 @@
     });
 </script>
 <script src="${root}/js/giohangcount.js" defer></script>
+<script>
+     window.CHATBOT_API_URL = 'http://localhost:5000/api/chat';
+</script>
