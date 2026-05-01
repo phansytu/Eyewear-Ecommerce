@@ -14,11 +14,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <!-- THÊM CSS MỚI - KHÔNG XUNG ĐỘT -->
-    <link rel="stylesheet" href="css/chatbot-news.css">
+    
 </head>
 <body>
+    <header>
     <jsp:include page="/WEB-INF/includes/header.jsp" />
-
+</header>
 
 <!-- Main Content -->
 <main class="container-fluid px-4 py-4">
@@ -269,91 +270,16 @@
             
             
 </main>
-            <!-- Floating Widgets: Chatbot & News -->
-<!--<div class="floating-widgets">
-    
-     Chatbot Widget 
-    <div class="widget-item chatbot-widget" id="chatbotWidget">
-        <div class="deal-badge">✨ AI</div>
-        <div class="widget-header">
-            <i class="fas fa-robot"></i>
-            <div>
-                <div class="widget-title">Trợ lý AI</div>
-                <div class="widget-subtitle">Hỗ trợ 24/7</div>
-            </div>
-        </div>
-        <div class="widget-content">
-            <div class="quick-replies">
-                <button class="quick-reply-btn" data-msg="Xem sản phẩm">🛍️ Xem sản phẩm</button>
-                <button class="quick-reply-btn" data-msg="Bảng giá">💰 Bảng giá</button>
-                <button class="quick-reply-btn" data-msg="Chính sách">📜 Chính sách</button>
-                <button class="quick-reply-btn" data-msg="Liên hệ">📞 Liên hệ</button>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" class="chat-input" id="chatInput" placeholder="Nhập tin nhắn...">
-                <button class="chat-send" id="chatSend">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-    
-     News Widget 
-    <div class="widget-item news-widget" id="newsWidget">
-        <div class="deal-badge">🔥 HOT</div>
-        <div class="widget-header">
-            <i class="fas fa-bullhorn"></i>
-            <div>
-                <div class="widget-title">Tin mới & Khuyến mãi</div>
-                <div class="widget-subtitle">Cập nhật liên tục</div>
-            </div>
-        </div>
-        <div class="widget-content">
-            <div class="news-item">
-                <div class="news-icon">
-                    <i class="fas fa-gift"></i>
-                </div>
-                <div class="news-content">
-                    <div class="news-title">
-                        Deal siêu wow! 
-                        <span class="news-badge">Mới</span>
-                    </div>
-                    <div class="news-desc">Coupon đến 30% - Sức khỏe dồi dào</div>
-                </div>
-            </div>
-            <div class="news-item">
-                <div class="news-icon">
-                    <i class="fas fa-tag"></i>
-                </div>
-                <div class="news-content">
-                    <div class="news-title">Top deal - Siêu rẻ</div>
-                    <div class="news-desc">Giảm giá sốc hàng ngàn sản phẩm</div>
-                </div>
-            </div>
-            <div class="news-item">
-                <div class="news-icon">
-                    <i class="fas fa-book"></i>
-                </div>
-                <div class="news-content">
-                    <div class="news-title">Top sách đáng đọc</div>
-                    <div class="news-desc">Ưu đãi lên đến 50%</div>
-                </div>
-            </div>
-            <a href="#" class="view-all">Xem tất cả <i class="fas fa-chevron-right"></i></a>
-        </div>
-    </div>
-    
-</div>-->
+     <!-- Cuối body, trước thẻ đóng body -->
+<jsp:include page="/WEB-INF/includes/chatbot.jsp" />
 
+<footer>
 <jsp:include page="/WEB-INF/includes/footer.jsp" />
-
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="${root}/js/home.js"></script>
 <script src="${root}/js/giohangcount.js"></script>
 <!--<script src="${root}/js/cart.js"></script>-->
 <!-- KHÔNG CẦN thêm chatbot.js nữa vì script đã có trong JSP -->
-</body>
-</html>
-
 </body>
 </html>
