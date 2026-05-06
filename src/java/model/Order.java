@@ -75,26 +75,30 @@ public class Order {
         return "Khách #" + userId;
     }
     
-    // Helper method cho status
-    public String getStatusText() {
-        switch(status) {
-            case "pending": return "Chờ xác nhận";
-            case "confirmed": return "Đã xác nhận";
-            case "shipping": return "Đang giao hàng";
-            case "delivered": return "Đã giao thành công";
-            case "cancelled": return "Đã hủy";
-            default: return status;
-        }
-    }
+   
+// Helper method cho status
     
-    public String getStatusBadgeClass() {
-        switch(status) {
-            case "pending": return "badge-pending";
-            case "confirmed": return "badge-confirmed";
-            case "shipping": return "badge-shipping";
-            case "delivered": return "badge-delivered";
-            case "cancelled": return "badge-cancelled";
-            default: return "badge-secondary";
-        }
+    
+// Trong Order.java, thêm các phương thức helper cho status
+public String getStatusText() {
+    switch(status) {
+        case "pending": return "Chờ thanh toán";
+        case "confirmed": return "Đã xác nhận";
+        case "shipping": return "Đang giao hàng";
+        case "delivered": return "Giao hàng thành công";
+        case "cancelled": return "Đã hủy";
+        default: return status;
     }
+}
+
+public String getStatusClass() {
+    switch(status) {
+        case "pending": return "warning";
+        case "confirmed": return "info";
+        case "shipping": return "primary";
+        case "delivered": return "success";
+        case "cancelled": return "danger";
+        default: return "secondary";
+    }
+}
 }

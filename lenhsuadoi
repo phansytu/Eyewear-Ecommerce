@@ -1,0 +1,11 @@
+
+cập nhật database:
+-- ALTER bảng reviews (nếu cần)
+ALTER TABLE eyewear_shop.reviews 
+ADD COLUMN status ENUM('pending', 'approved', 'hidden') DEFAULT 'approved',
+ADD COLUMN images TEXT NULL COMMENT 'Lưu JSON array của ảnh',
+ADD COLUMN helpful_count INT DEFAULT 0;
+use eyewear_shop;
+-- Cập nhật chỉ mục
+CREATE INDEX idx_product_rating ON reviews(product_id, rating);
+CREATE INDEX idx_user_review ON reviews(user_id, product_id);

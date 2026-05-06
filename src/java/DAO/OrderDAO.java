@@ -20,25 +20,25 @@ public class OrderDAO {
      * @param userId ID của user
      * @return List<Order>
      */
-    public List<Order> getOrdersByUserId(int userId) {
-        List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC";
-        
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                Order order = mapResultSetToOrder(rs);
-                order.setOrderDetails(getOrderDetailsByOrderId(order.getId()));
-                orders.add(order);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return orders;
-    }
+//    public List<Order> getOrdersByUserId(int userId) {
+//        List<Order> orders = new ArrayList<>();
+//        String sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC";
+//        
+//        try (Connection conn = DBConnect.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//            ps.setInt(1, userId);
+//            ResultSet rs = ps.executeQuery();
+//            
+//            while (rs.next()) {
+//                Order order = mapResultSetToOrder(rs);
+//                order.setOrderDetails(getOrderDetailsByOrderId(order.getId()));
+//                orders.add(order);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return orders;
+//    }
     
     /**
      * Lấy đơn hàng theo ID
@@ -724,5 +724,56 @@ public boolean confirmOrderDelivery(int orderId) {
     }
     return updated;
 }
+// Thêm vào OrderDAO.java
 
+public List<Order> getOrdersByUserId(int userId) {
+    List<Order> orders = new ArrayList<>();
+    String sql = """
+        SELECT o.*, u.username, u.full_name, u.email
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        WHERE o.user_id = ?
+        ORDER BY o.created_at DESC
+        """;
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Order order = mapResultSetToOrder(rs);
+            order.setOrderDetails(getOrderDetailsByOrderId(order.getId()));
+            orders.add(order);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return orders;
+}
+
+public List<Order> getOrdersByUserIdAndStatus(int userId, String status) {
+    List<Order> orders = new ArrayList<>();
+    String sql = """
+        SELECT o.*, u.username, u.full_name, u.email
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        WHERE o.user_id = ? AND o.status = ?
+        ORDER BY o.created_at DESC
+        """;
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        ps.setString(2, status);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Order order = mapResultSetToOrder(rs);
+            order.setOrderDetails(getOrderDetailsByOrderId(order.getId()));
+            orders.add(order);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return orders;
+}
 }
