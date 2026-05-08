@@ -1,0 +1,267 @@
+/* Admin Chatbot Container - Thường ở góc phải hoặc full màn hình */
+.admin-chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 420px;
+    max-height: 80vh;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.admin-chatbot-container.minimized {
+    max-height: 50px;
+}
+
+.admin-chatbot-container.minimized .admin-panel-body {
+    display: none;
+}
+
+/* Header */
+.admin-panel-header {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.admin-panel-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.minimize-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.minimize-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Body */
+.admin-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: calc(80vh - 50px);
+}
+
+.admin-panel-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.admin-panel-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* Stat card */
+.admin-stat-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+}
+
+.admin-stat-card h4 {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: #7c3aed;
+}
+
+.refresh-stats-btn {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.refresh-stats-btn:hover {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+/* Section */
+.admin-section {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.admin-section h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Unresolved list */
+.unresolved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.unresolved-item {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+.unresolved-item .question {
+    color: #9a3412;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.unresolved-item .timestamp {
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+.unresolved-item .use-btn {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.empty-state {
+    color: #94a3b8;
+    font-size: 12px;
+    text-align: center;
+    padding: 16px;
+}
+
+/* QA Form */
+.qa-form input,
+.qa-form textarea,
+.qa-form select {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    font-family: inherit;
+    outline: none;
+}
+
+.qa-form input:focus,
+.qa-form textarea:focus,
+.qa-form select:focus {
+    border-color: #667eea;
+}
+
+.submit-qa-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.submit-qa-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-message {
+    font-size: 11px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.form-message.success { color: #16a34a; }
+.form-message.error { color: #dc2626; }
+
+/* Buttons */
+.view-logs-btn,
+.logout-admin-btn {
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+.view-logs-btn {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.view-logs-btn:hover {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.logout-admin-btn {
+    background: #ef4444;
+    color: white;
+    margin-bottom: 0;
+}
+
+.logout-admin-btn:hover {
+    opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .admin-chatbot-container {
+        width: calc(100vw - 40px);
+        right: 20px;
+        bottom: 20px;
+    }
+}

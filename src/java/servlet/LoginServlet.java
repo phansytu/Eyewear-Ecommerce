@@ -38,7 +38,7 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // SỬA: Thêm UTF-8 để nhận và trả JSON tiếng Việt không bị lỗi font (???)
+        // SỬA: Thêm UTF-8 để nhận và trả JSON tiếng Việt không bị lỗi font
         request.setCharacterEncoding("UTF-8");
         
         String username = request.getParameter("username");
@@ -53,7 +53,6 @@ public class LoginServlet extends HttpServlet {
             password == null || password.trim().isEmpty()) {
             
             if (isAjax) {
-                // SỬA: Đảm bảo Response JSON có mã hóa UTF-8
                 response.setContentType("application/json; charset=UTF-8"); 
                 Map<String, Object> jsonResponse = new HashMap<>();
                 jsonResponse.put("success", false);
@@ -69,11 +68,20 @@ public class LoginServlet extends HttpServlet {
         User user = userDAO.authenticate(username, password, ipAddress);
         
         if (user != null) {
-            // Đăng nhập thành công
+            // ========== ĐĂNG NHẬP THÀNH CÔNG ==========
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             session.setAttribute("username", user.getUsername());
             session.setAttribute("role", user.getRole());
+            
+            // 🔥 THÊM MỚI: Set user_role cho chatbot phân quyền
+            // Giá trị có thể là "ADMIN" hoặc "USER"
+            if (user.isAdmin()) {
+                session.setAttribute("user_role", "ADMIN");
+            } else {
+                session.setAttribute("user_role", "USER");
+            }
+            
             session.setMaxInactiveInterval(30 * 60);
             
             if (isAjax) {
@@ -81,10 +89,16 @@ public class LoginServlet extends HttpServlet {
                 Map<String, Object> jsonResponse = new HashMap<>();
                 jsonResponse.put("success", true);
                 jsonResponse.put("role", user.getRole());
+                jsonResponse.put("user_role", user.isAdmin() ? "ADMIN" : "USER");  // 🔥 THÊM MỚI
                 
-                // SỬA: Đồng nhất đường dẫn chuyển hướng Admin
-                // Ép tất cả đều về trang chủ
-jsonResponse.put("redirect", request.getContextPath() + "/home");
+                // 🔥 SỬA: Phân biệt redirect cho user và admin
+                String redirectUrl;
+                if (user.isAdmin()) {
+                    redirectUrl = request.getContextPath() + "/jsp/admin/dashboard.jsp";
+                } else {
+                    redirectUrl = request.getContextPath() + "/home";
+                }
+                jsonResponse.put("redirect", redirectUrl);
                 
                 response.getWriter().write(new Gson().toJson(jsonResponse));
             } else {
@@ -95,6 +109,7 @@ jsonResponse.put("redirect", request.getContextPath() + "/home");
                 }
             }
         } else {
+            // ========== ĐĂNG NHẬP THẤT BẠI ==========
             User lockedUser = userDAO.getUserByUsername(username);
             
             if (isAjax) {

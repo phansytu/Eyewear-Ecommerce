@@ -44,9 +44,9 @@
                     Xin chào! Tôi là trợ lý ảo AI của TuKhanhHuy.
                     <div class="quick-actions">
                         <button class="quick-btn" data-msg="sản phẩm">🛍️ Xem sản phẩm</button>
-                        <button class="quick-btn" data-msg="giá rẻ">💰 Tìm giá rẻ</button>
+                        <button class="quick-btn" data-msg="kính dưới 500k">💰 Tìm giá rẻ</button>
                         <button class="quick-btn" data-msg="kính râm">🕶️ Kính râm</button>
-                        <button class="quick-btn" data-msg="chính sách">📜 Chính sách</button>
+                        <button class="quick-btn" data-msg="chính sách bảo hành">📜 Chính sách</button>
                         <button class="quick-btn" data-msg="liên hệ">📞 Liên hệ</button>
                     </div>
                     <span class="message-time">Vừa xong</span>
@@ -67,8 +67,7 @@
 </div>
 
 <script>
-    // Khai báo API URL
     window.CHATBOT_API_URL = 'http://localhost:5000/api/chat';
+    window.USER_ROLE = 'USER';
 </script>
-<script src="${root}/js/chatbot.js"></script>
-<!--chatbot.jsp cũ của tôi hãy làm thành có điều kiện đi và hãy làm thành cấu trúc để tôi đưa code từ index.html vào cho từng role tương ứng-->
+<script src="${root}/js/chatbot-user.js"></script>

@@ -1,409 +1,416 @@
 """
 =============================================================
-KNOWLEDGE BASE - Đọc và phân tích file knowledge.txt
+KNOWLEDGE BASE - Fixed v2
 =============================================================
-Hỗ trợ 2 định dạng:
-  1. Q&A: "Q: câu hỏi\nA: câu trả lời"
-  2. Chủ đề: "## Tên chủ đề\nNội dung..."
+Fix:
+  1. Parse được mọi format file ngoài (không cần ## header)
+  2. Threshold thực tế thấp hơn (0.15 thay vì 0.30)
+  3. Matching tốt hơn: substring + partial word + TF-IDF
+  4. Log rõ khi không tìm được để debug
 =============================================================
 """
 
-import re
-import os
-import logging
-from typing import List, Dict, Tuple, Optional
+import re, os, logging
+from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class KnowledgeBase:
-    """
-    Lưu trữ và tra cứu kiến thức từ file .txt.
-    Không cần GPU, không cần model lớn.
-    Sử dụng TF-IDF + keyword matching để tìm kiếm.
-    """
 
     def __init__(self):
-        self.topics: Dict[str, str] = {}       # {tên chủ đề: nội dung}
-        self.qa_pairs: List[Dict] = []         # [{question, answer, topic, keywords}]
-        self.raw_sentences: List[Dict] = []    # tất cả câu để tìm kiếm
+        self.topics: Dict[str, str] = {}
+        self.qa_pairs: List[Dict]   = []
+        self.raw_sentences: List[Dict] = []
         self._is_loaded = False
-
-        # TF-IDF matrices (được tính sau khi load)
         self._tfidf_matrix = None
-        self._vectorizer = None
+        self._vectorizer   = None
 
-    # ─── Load file ────────────────────────────────────────
+    # =========================================================
+    #  LOAD FILE
+    # =========================================================
 
     def load_file(self, file_path: str) -> Dict:
-        """
-        Đọc và phân tích file knowledge.txt
-        
-        Returns:
-            dict thống kê: topics_count, qa_count, sentences_count
-        """
         if not os.path.exists(file_path):
-            raise FileNotFoundError(f"Không tìm thấy file: {file_path}")
+            raise FileNotFoundError(f"Không tìm thấy: {file_path}")
 
-        logger.info(f"📖 Loading knowledge from: {file_path}")
-
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
 
         # Reset
-        self.topics = {}
-        self.qa_pairs = []
+        self.topics        = {}
+        self.qa_pairs      = []
         self.raw_sentences = []
+        self._tfidf_matrix = None
+        self._vectorizer   = None
 
-        # Parse nội dung
-        self._parse_topics(content)
-        self._parse_qa_pairs(content)
-        self._extract_sentences()
-        self._build_search_index()
+        self._parse_all_formats(content)
+        self._extract_sentences_from_topics()
+        self._build_tfidf()
 
         self._is_loaded = True
-
         stats = {
-            'topics_count': len(self.topics),
-            'qa_count': len(self.qa_pairs),
+            'topics_count':    len(self.topics),
+            'qa_count':        len(self.qa_pairs),
             'sentences_count': len(self.raw_sentences),
-            'file_path': file_path,
-            'file_size_kb': round(os.path.getsize(file_path) / 1024, 1)
+            'file_kb':         round(os.path.getsize(file_path) / 1024, 1),
         }
         logger.info(f"✅ Knowledge loaded: {stats}")
         return stats
 
-    def _parse_topics(self, content: str):
-        """Phân tích các chủ đề bắt đầu bằng ## hoặc #"""
-        # Tách theo dấu ## (heading level 2)
-        topic_pattern = re.compile(
-            r'##\s*(.+?)\n(.*?)(?=##|\Z)',
-            re.DOTALL
-        )
-        for match in topic_pattern.finditer(content):
-            topic_name = match.group(1).strip()
-            topic_content = match.group(2).strip()
-            if topic_name and topic_content:
-                self.topics[topic_name] = topic_content
-                logger.debug(f"  Topic: '{topic_name}' ({len(topic_content)} chars)")
+    # =========================================================
+    #  PARSE - hỗ trợ mọi format
+    # =========================================================
 
-        logger.info(f"  → Parsed {len(self.topics)} topics")
-
-    def _parse_qa_pairs(self, content: str):
-        """Phân tích các cặp Q: ... A: ..."""
-        # Pattern linh hoạt: Q:, Hỏi:, Khách:
-        q_pattern = re.compile(
-            r'(?:Q:|Hỏi:|Khách:|[Qq]uestion:)\s*(.+?)(?:\n|$)',
-            re.MULTILINE
-        )
-        a_pattern = re.compile(
-            r'(?:A:|Đáp:|Shop:|[Aa]nswer:|Trả lời:)\s*(.+?)(?=\n(?:Q:|Hỏi:|Khách:|A:|Đáp:|Shop:|##|-----)|$)',
-            re.DOTALL
-        )
-
+    def _parse_all_formats(self, content: str):
+        """
+        Parse được tất cả các format phổ biến:
+          Format 1: Q: ...  A: ...          (có trong knowledge.txt cũ)
+          Format 2: Khách: ... Shop: ...    (hội thoại)
+          Format 3: ## Chủ đề \n nội dung  (markdown header)
+          Format 4: Nội dung tự do          (không có marker)
+          Format 5: Câu hỏi? \n Trả lời.   (câu hỏi + dòng tiếp theo)
+        """
         lines = content.split('\n')
-        current_q = None
+        current_topic   = 'Chung'
+        current_q       = None
         current_a_lines = []
-        current_topic = None
+        i = 0
 
-        for line in lines:
-            line = line.strip()
+        while i < len(lines):
+            line = lines[i].strip()
+            i += 1
 
-            # Theo dõi chủ đề hiện tại
-            if line.startswith('##'):
-                current_topic = line.lstrip('#').strip()
+            if not line or line.startswith('#!') or line.startswith('//'):
+                continue
 
-            # Dòng câu hỏi
-            q_match = re.match(r'^(?:Q:|Hỏi:|Khách:)\s*(.+)', line)
-            if q_match:
-                # Lưu cặp Q&A trước (nếu có)
+            # ── Header chủ đề ──────────────────────────────
+            if line.startswith('##') or line.startswith('# '):
+                # Lưu Q&A đang dở
                 if current_q and current_a_lines:
                     self._add_qa(current_q, ' '.join(current_a_lines), current_topic)
-                current_q = q_match.group(1).strip()
+                    current_q, current_a_lines = None, []
+                current_topic = re.sub(r'^#+\s*', '', line).strip()
+                # Lấy ngày bổ sung nếu có: "Tư vấn (Bổ sung 2024-01-15)" → "Tư vấn"
+                current_topic = re.sub(r'\s*\(.+\)\s*$', '', current_topic).strip()
+                if not current_topic:
+                    current_topic = 'Chung'
+                self.topics.setdefault(current_topic, '')
+                continue
+
+            # ── Phân cách ──────────────────────────────────
+            if re.match(r'^[-─=]{3,}$', line):
+                if current_q and current_a_lines:
+                    self._add_qa(current_q, ' '.join(current_a_lines), current_topic)
+                    current_q, current_a_lines = None, []
+                continue
+
+            # ── Q: / Hỏi: / Khách: ─────────────────────────
+            q_m = re.match(
+                r'^(?:Q\s*:|Hỏi\s*:|Khách\s*:|Question\s*:)\s*(.+)',
+                line, re.IGNORECASE
+            )
+            if q_m:
+                if current_q and current_a_lines:
+                    self._add_qa(current_q, ' '.join(current_a_lines), current_topic)
+                current_q       = q_m.group(1).strip()
                 current_a_lines = []
                 continue
 
-            # Dòng câu trả lời
-            a_match = re.match(r'^(?:A:|Đáp:|Shop:)\s*(.+)', line)
-            if a_match and current_q:
-                current_a_lines.append(a_match.group(1).strip())
+            # ── A: / Đáp: / Shop: / Answer: ────────────────
+            a_m = re.match(
+                r'^(?:A\s*:|Đáp\s*:|Shop\s*:|Answer\s*:|Trả lời\s*:)\s*(.+)',
+                line, re.IGNORECASE
+            )
+            if a_m:
+                current_a_lines.append(a_m.group(1).strip())
+                # Gom thêm dòng tiếp theo nếu không có marker
+                while i < len(lines):
+                    nxt = lines[i].strip()
+                    if not nxt:
+                        break
+                    if re.match(r'^(?:Q\s*:|A\s*:|Hỏi:|Khách:|Shop:|Đáp:|##|-----)', nxt, re.IGNORECASE):
+                        break
+                    current_a_lines.append(nxt)
+                    i += 1
                 continue
 
-            # Tiếp tục câu trả lời dài (nếu đang trong block A)
-            if current_a_lines and line and not line.startswith('Q:') \
-                    and not line.startswith('Hỏi:') and not line.startswith('##') \
-                    and not line.startswith('-----'):
-                current_a_lines.append(line)
+            # ── Nội dung gắn vào chủ đề hiện tại ──────────
+            if current_topic and current_topic in self.topics:
+                self.topics[current_topic] += (' ' + line)
+            else:
+                # Nếu chưa có topic nào, gắn vào Chung
+                self.topics.setdefault('Chung', '')
+                self.topics['Chung'] += (' ' + line)
 
-        # Lưu cặp cuối cùng
+        # Lưu cặp cuối
         if current_q and current_a_lines:
             self._add_qa(current_q, ' '.join(current_a_lines), current_topic)
 
-        logger.info(f"  → Parsed {len(self.qa_pairs)} Q&A pairs")
+        logger.info(f"  → topics={len(self.topics)}  qa_pairs={len(self.qa_pairs)}")
 
-    def _add_qa(self, question: str, answer: str, topic: Optional[str] = None):
-        """Thêm một cặp Q&A vào danh sách"""
-        question = question.strip()
-        answer = answer.strip()
-        if not question or not answer:
+    def _add_qa(self, question: str, answer: str, topic: str = 'Chung'):
+        q = question.strip()
+        a = answer.strip()
+        if not q or not a or len(a) < 3:
             return
-
+        # Tránh trùng câu hỏi
+        for existing in self.qa_pairs:
+            if existing['question'].lower() == q.lower():
+                existing['answer'] = a  # cập nhật nếu trùng
+                return
         self.qa_pairs.append({
-            'question': question,
-            'answer': answer,
-            'topic': topic or 'Chung',
-            'keywords': self._extract_keywords(question + ' ' + answer)
+            'question': q,
+            'answer':   a,
+            'topic':    topic or 'Chung',
+            'keywords': self._keywords(q + ' ' + a),
         })
 
-    def _extract_sentences(self):
-        """Trích xuất tất cả câu từ nội dung chủ đề"""
-        for topic_name, content in self.topics.items():
-            # Tách câu
-            sentences = re.split(r'[.!?]\s+|\n+', content)
-            for sent in sentences:
+    def _extract_sentences_from_topics(self):
+        for topic, content in self.topics.items():
+            content = content.strip()
+            if not content:
+                continue
+            for sent in re.split(r'[.!?\n]+', content):
                 sent = sent.strip()
-                if len(sent) > 20:  # Bỏ câu quá ngắn
+                if len(sent) > 15:
                     self.raw_sentences.append({
-                        'text': sent,
-                        'topic': topic_name,
-                        'keywords': self._extract_keywords(sent)
+                        'text':     sent,
+                        'topic':    topic,
+                        'keywords': self._keywords(sent),
                     })
 
-    def _extract_keywords(self, text: str) -> List[str]:
-        """Trích xuất từ khóa từ text tiếng Việt"""
-        # Làm sạch
-        text = text.lower()
-        text = re.sub(r'[^\w\s]', ' ', text)
+    # =========================================================
+    #  TF-IDF INDEX
+    # =========================================================
 
-        # Stopwords tiếng Việt cơ bản
-        stopwords = {
-            'và', 'hoặc', 'là', 'có', 'không', 'của', 'cho', 'với',
-            'trong', 'ngoài', 'trên', 'dưới', 'này', 'đó', 'khi',
-            'thì', 'mà', 'nhưng', 'vì', 'để', 'từ', 'đến', 'bởi',
-            'tại', 'hay', 'cũng', 'đều', 'rất', 'khá', 'hơn', 'nhất',
-            'được', 'bị', 'làm', 'như', 'theo', 'về', 'ra', 'vào',
-            'lên', 'xuống', 'qua', 'lại', 'đã', 'sẽ', 'đang', 'cần',
-            'muốn', 'biết', 'thấy', 'nên', 'phải', 'có thể', 'bạn',
-            'shop', 'ạ', 'ơi', 'nhé', 'nha', 'ah', 'uh', 'thôi',
-            'mình', 'em', 'anh', 'chị', 'bạn', 'ạ'
-        }
-
-        words = text.split()
-        keywords = [w for w in words if len(w) > 2 and w not in stopwords]
-        return list(set(keywords))
-
-    def _build_search_index(self):
-        """Xây dựng TF-IDF index để tìm kiếm nhanh"""
+    def _build_tfidf(self):
         try:
             from sklearn.feature_extraction.text import TfidfVectorizer
-            import numpy as np
 
-            # Gộp tất cả texts: câu hỏi từ Q&A + câu từ topics
-            all_texts = []
-            for qa in self.qa_pairs:
-                all_texts.append(qa['question'])
-            for sent in self.raw_sentences:
-                all_texts.append(sent['text'])
+            # Gộp Q&A questions + raw sentences
+            all_texts = [qa['question'] for qa in self.qa_pairs] + \
+                        [s['text'] for s in self.raw_sentences]
 
             if len(all_texts) < 2:
                 return
 
             self._vectorizer = TfidfVectorizer(
-                analyzer='char_wb',   # Character n-gram, tốt cho tiếng Việt
+                analyzer='char_wb',
                 ngram_range=(2, 4),
                 min_df=1,
-                max_features=5000,
+                max_features=8000,
                 sublinear_tf=True
             )
-
             self._tfidf_matrix = self._vectorizer.fit_transform(all_texts)
-            logger.info(f"  → TF-IDF index built: {self._tfidf_matrix.shape}")
-
+            logger.info(f"  → TF-IDF {self._tfidf_matrix.shape}")
         except ImportError:
-            logger.warning("  ⚠️  sklearn not installed. Using keyword matching only.")
+            logger.warning("  ⚠️  sklearn không có — dùng keyword matching")
+        except Exception as e:
+            logger.error(f"  TF-IDF build error: {e}")
 
-    # ─── Tìm kiếm ─────────────────────────────────────────
+    # =========================================================
+    #  SEARCH - FIX CHÍNH
+    # =========================================================
 
-    def search(self, query: str, top_k: int = 3, threshold: float = 0.3) -> List[Dict]:
+    def search(self, query: str, top_k: int = 3,
+               threshold: float = 0.15) -> List[Dict]:
         """
-        Tìm kiếm câu trả lời phù hợp nhất cho câu hỏi.
-        
-        Args:
-            query: câu hỏi của người dùng
-            top_k: số kết quả trả về
-            threshold: ngưỡng độ tương đồng tối thiểu
-        
-        Returns:
-            List[Dict]: [{answer, source, confidence, topic}, ...]
+        Tìm kiếm đa tầng:
+          Tầng 1: Exact / Substring match (nhanh, chính xác cao)
+          Tầng 2: Keyword overlap
+          Tầng 3: TF-IDF cosine similarity
+          Tầng 4: Partial word match (fallback)
         """
+        if not self._is_loaded:
+            return []
+
+        all_results = []
+
+        # Tầng 1 + 2: exact & keyword
+        all_results.extend(self._search_exact_keyword(query, top_k * 2))
+
+        # Tầng 3: TF-IDF
+        if self._vectorizer is not None:
+            all_results.extend(self._search_tfidf(query, top_k * 2))
+
+        # Tầng 4: partial word fallback (khi không có kết quả nào)
+        if not all_results or max((r['confidence'] for r in all_results), default=0) < 0.2:
+            all_results.extend(self._search_partial(query, top_k))
+
+        # Deduplicate + filter + sort
+        seen = set()
+        uniq = []
+        for r in sorted(all_results, key=lambda x: x['confidence'], reverse=True):
+            key = r['answer'][:60].lower().strip()
+            if key not in seen:
+                seen.add(key)
+                uniq.append(r)
+
+        filtered = [r for r in uniq if r['confidence'] >= threshold]
+
+        if not filtered:
+            logger.debug(f"  No results above threshold={threshold} for: '{query[:50]}'")
+            # Log top scores để debug
+            if uniq:
+                top3 = uniq[:3]
+                logger.debug(f"  Top candidates: " + "; ".join(
+                    f"[{r['confidence']:.2f}] {r['answer'][:50]}" for r in top3
+                )
+)
+
+        return filtered[:top_k]
+
+    # ── Tầng 1+2: Exact / Substring / Keyword ─────────────
+
+    def _search_exact_keyword(self, query: str, top_k: int) -> List[Dict]:
+        q_low  = query.lower().strip()
+        q_kws  = set(self._keywords(query))
         results = []
-
-        # 1. Tìm kiếm exact/fuzzy trong Q&A pairs
-        qa_results = self._search_qa_pairs(query, top_k)
-        results.extend(qa_results)
-
-        # 2. TF-IDF search (nếu có)
-        if self._vectorizer is not None and self._tfidf_matrix is not None:
-            tfidf_results = self._search_tfidf(query, top_k)
-            results.extend(tfidf_results)
-
-        # 3. Keyword fallback
-        if not results:
-            kw_results = self._search_keywords(query, top_k)
-            results.extend(kw_results)
-
-        # Lọc theo threshold và deduplicate
-        results = [r for r in results if r['confidence'] >= threshold]
-        results = self._deduplicate(results)
-        results.sort(key=lambda x: x['confidence'], reverse=True)
-
-        return results[:top_k]
-
-    def _search_qa_pairs(self, query: str, top_k: int) -> List[Dict]:
-        """Tìm trong danh sách Q&A pairs"""
-        results = []
-        query_lower = query.lower()
-        query_keywords = self._extract_keywords(query)
 
         for qa in self.qa_pairs:
-            score = 0.0
-            q_lower = qa['question'].lower()
+            qa_low = qa['question'].lower().strip()
+            score  = 0.0
 
-            # 1. Exact match
-            if query_lower == q_lower:
+            # Exact
+            if q_low == qa_low:
                 score = 1.0
-            # 2. Substring match
-            elif query_lower in q_lower or q_lower in query_lower:
-                score = 0.8
-            # 3. Keyword overlap
+            # Query là substring của câu hỏi
+            elif q_low in qa_low:
+                score = 0.85
+            # Câu hỏi là substring của query
+            elif qa_low in q_low:
+                score = 0.80
             else:
-                q_keywords = qa['keywords']
-                if q_keywords and query_keywords:
-                    overlap = len(set(query_keywords) & set(q_keywords))
-                    score = overlap / max(len(query_keywords), len(q_keywords), 1)
-                    score = min(score * 1.2, 0.9)  # Boost keyword score
+                # Keyword overlap
+                qa_kws = set(qa['keywords'])
+                if q_kws and qa_kws:
+                    overlap = len(q_kws & qa_kws)
+                    if overlap > 0:
+                        score = overlap / max(len(q_kws), len(qa_kws))
+                        score = min(score * 1.3, 0.75)
+
+            if score > 0.05:
+                results.append({
+                    'answer':           qa['answer'],
+                    'source':           'qa_exact',
+                    'confidence':       score,
+                    'topic':            qa.get('topic', 'Chung'),
+                    'matched_question': qa['question'],
+                })
+
+        # Tìm trong topic content cũng
+        for sent in self.raw_sentences:
+            s_low = sent['text'].lower()
+            score = 0.0
+            if q_low in s_low:
+                score = 0.60
+            elif s_low in q_low:
+                score = 0.55
+            else:
+                s_kws = set(sent['keywords'])
+                if q_kws and s_kws:
+                    overlap = len(q_kws & s_kws)
+                    if overlap > 0:
+                        score = (overlap / max(len(q_kws), len(s_kws))) * 0.6
 
             if score > 0.1:
                 results.append({
-                    'answer': qa['answer'],
-                    'source': 'qa_pair',
+                    'answer':     sent['text'],
+                    'source':     'topic_match',
                     'confidence': score,
-                    'topic': qa.get('topic', 'Chung'),
-                    'matched_question': qa['question']
+                    'topic':      sent.get('topic', 'Chung'),
                 })
 
         results.sort(key=lambda x: x['confidence'], reverse=True)
         return results[:top_k]
 
+    # ── Tầng 3: TF-IDF ─────────────────────────────────────
+
     def _search_tfidf(self, query: str, top_k: int) -> List[Dict]:
-        """Tìm kiếm bằng TF-IDF cosine similarity"""
         try:
             from sklearn.metrics.pairwise import cosine_similarity
             import numpy as np
 
-            query_vec = self._vectorizer.transform([query])
-            similarities = cosine_similarity(query_vec, self._tfidf_matrix)[0]
-
-            # Lấy top indices
-            top_indices = np.argsort(similarities)[::-1][:top_k * 2]
+            qv   = self._vectorizer.transform([query])
+            sims = cosine_similarity(qv, self._tfidf_matrix)[0]
+            idxs = np.argsort(sims)[::-1][:top_k * 2]
             n_qa = len(self.qa_pairs)
             results = []
 
-            for idx in top_indices:
-                score = float(similarities[idx])
-                if score < 0.15:
-                    continue
-
+            for idx in idxs:
+                score = float(sims[idx])
+                if score < 0.05:
+                    break
                 if idx < n_qa:
-                    # Là Q&A pair
                     qa = self.qa_pairs[idx]
                     results.append({
-                        'answer': qa['answer'],
-                        'source': 'tfidf_qa',
-                        'confidence': score,
-                        'topic': qa.get('topic', 'Chung'),
-                        'matched_question': qa['question']
+                        'answer':           qa['answer'],
+                        'source':           'tfidf',
+                        'confidence':       score,
+                        'topic':            qa.get('topic', 'Chung'),
+                        'matched_question': qa['question'],
                     })
                 else:
-                    # Là câu từ topic
-                    sent_idx = idx - n_qa
-                    if sent_idx < len(self.raw_sentences):
-                        sent = self.raw_sentences[sent_idx]
+                    si = idx - n_qa
+                    if si < len(self.raw_sentences):
+                        s = self.raw_sentences[si]
                         results.append({
-                            'answer': sent['text'],
-                            'source': 'tfidf_topic',
-                            'confidence': score * 0.8,  # Giảm nhẹ vì là câu topic
-                            'topic': sent.get('topic', 'Chung')
+                            'answer':     s['text'],
+                            'source':     'tfidf_topic',
+                            'confidence': score * 0.75,
+                            'topic':      s.get('topic', 'Chung'),
                         })
-
             return results
-
         except Exception as e:
             logger.debug(f"TF-IDF search error: {e}")
             return []
 
-    def _search_keywords(self, query: str, top_k: int) -> List[Dict]:
-        """Fallback: tìm kiếm theo từ khóa đơn giản"""
-        query_keywords = set(self._extract_keywords(query))
+    # ── Tầng 4: Partial word (fallback) ────────────────────
+
+    def _search_partial(self, query: str, top_k: int) -> List[Dict]:
+        """Tách query thành từng từ, tìm từng từ riêng lẻ"""
+        words = [w for w in query.lower().split() if len(w) > 2]
+        if not words:
+            return []
+
         results = []
-
         for qa in self.qa_pairs:
-            qa_keywords = set(qa['keywords'])
-            if query_keywords & qa_keywords:
-                score = len(query_keywords & qa_keywords) / max(len(query_keywords), 1)
+            qa_text = (qa['question'] + ' ' + qa['answer']).lower()
+            hit = sum(1 for w in words if w in qa_text)
+            if hit > 0:
+                score = (hit / len(words)) * 0.45
                 results.append({
-                    'answer': qa['answer'],
-                    'source': 'keyword',
-                    'confidence': score * 0.6,
-                    'topic': qa.get('topic', 'Chung')
-                })
-
-        # Tìm trong topic content
-        for sent in self.raw_sentences:
-            sent_keywords = set(sent['keywords'])
-            if query_keywords & sent_keywords:
-                score = len(query_keywords & sent_keywords) / max(len(query_keywords), 1)
-                results.append({
-                    'answer': sent['text'],
-                    'source': 'keyword_topic',
-                    'confidence': score * 0.5,
-                    'topic': sent.get('topic', 'Chung')
+                    'answer':     qa['answer'],
+                    'source':     'partial',
+                    'confidence': score,
+                    'topic':      qa.get('topic', 'Chung'),
                 })
 
         results.sort(key=lambda x: x['confidence'], reverse=True)
         return results[:top_k]
 
-    def search_topic(self, topic_name: str) -> Optional[str]:
-        """Lấy nội dung của một chủ đề"""
-        # Tìm exact
-        if topic_name in self.topics:
-            return self.topics[topic_name]
-        # Tìm partial match
-        topic_lower = topic_name.lower()
-        for name, content in self.topics.items():
-            if topic_lower in name.lower() or name.lower() in topic_lower:
-                return content
-        return None
+    # =========================================================
+    #  HELPERS
+    # =========================================================
 
-    def _deduplicate(self, results: List[Dict]) -> List[Dict]:
-        """Loại bỏ kết quả trùng lặp"""
-        seen = set()
-        unique = []
-        for r in results:
-            # Dùng 50 ký tự đầu làm key
-            key = r['answer'][:50].strip().lower()
-            if key not in seen:
-                seen.add(key)
-                unique.append(r)
-        return unique
+    _STOPWORDS = {
+        'và','hoặc','là','có','không','của','cho','với','trong','ngoài','trên',
+        'dưới','này','đó','khi','thì','mà','nhưng','vì','để','từ','đến','bởi',
+        'tại','hay','cũng','đều','rất','khá','hơn','nhất','được','bị','làm',
+        'như','theo','về','ra','vào','lên','xuống','qua','lại','đã','sẽ','đang',
+        'cần','muốn','biết','thấy','nên','phải','bạn','shop','ạ','ơi','nhé',
+        'nha','thôi','mình','em','anh','chị','dạ','vậy','ấy','thật'
+    }
 
-    # ─── Properties ───────────────────────────────────────
+    def _keywords(self, text: str) -> List[str]:
+        text = text.lower()
+        text = re.sub(r'[^\w\sàáâãèéêìíòóôõùúăđĩũơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]', ' ', text)
+        words = text.split()
+        return list(set(w for w in words if len(w) > 1 and w not in self._STOPWORDS))
 
-    def is_loaded(self) -> bool:
-        return self._is_loaded
+    # ─── Public helpers ───────────────────────────────────
 
-    def get_topic_names(self) -> List[str]:
-        return list(self.topics.keys())
-
-    def get_qa_count(self) -> int:
-        return len(self.qa_pairs)
+    def is_loaded(self)        -> bool:       return self._is_loaded
+    def get_topic_names(self)  -> List[str]:  return list(self.topics.keys())
+    def get_qa_count(self)     -> int:        return len(self.qa_pairs)
