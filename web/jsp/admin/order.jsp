@@ -220,7 +220,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge ${o.statusBadgeClass}">
+                                        <span class="badge badge-${o.statusClass}">
                                             <i class="${o.status == 'pending' ? 'fa-regular fa-clock' : 
                                                        o.status == 'confirmed' ? 'fa-regular fa-circle-check' : 
                                                        o.status == 'shipping' ? 'fa-solid fa-truck' : 

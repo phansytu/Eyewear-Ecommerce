@@ -43,17 +43,21 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
         
+        // Lấy user mới nhất từ DB
+        User freshUser = userDAO.getUserById(user.getId());
+        if (freshUser != null) {
+            session.setAttribute("user", freshUser);
+        }
+        
         String activeTab = request.getParameter("tab");
         if (activeTab == null) activeTab = "profile";
         
         // Lấy danh sách đơn hàng của user
-        if (activeTab.equals("orders") || activeTab.equals("profile")) {
-            List<Order> orders = orderDAO.getOrdersByUserId(user.getId());
-            request.setAttribute("orders", orders);
-        }
+        List<Order> orders = orderDAO.getOrdersByUserId(user.getId());
+        request.setAttribute("orders", orders);
         
         request.setAttribute("activeTab", activeTab);
-        request.getRequestDispatcher("/profile.jsp").forward(request, response);
+       request.getRequestDispatcher("/profile.jsp").forward(request, response);
     }
     
     @Override
@@ -72,6 +76,7 @@ public class ProfileServlet extends HttpServlet {
         }
         
         String action = request.getParameter("action");
+        String activeTab = request.getParameter("tab") != null ? request.getParameter("tab") : "profile";
         
         // Kiểm tra nếu là AJAX upload avatar
         String contentType = request.getContentType();
@@ -83,7 +88,6 @@ public class ProfileServlet extends HttpServlet {
         }
         
         if ("updateProfile".equals(action)) {
-            // Cập nhật thông tin hồ sơ
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String address = request.getParameter("address");
@@ -102,33 +106,34 @@ public class ProfileServlet extends HttpServlet {
             
             if (updated) {
                 session.setAttribute("user", user);
-                request.setAttribute("successMessage", "Cập nhật hồ sơ thành công!");
+                session.setAttribute("success", "Cập nhật hồ sơ thành công!");
             } else {
-                request.setAttribute("errorMessage", "Cập nhật hồ sơ thất bại!");
+                session.setAttribute("error", "Cập nhật hồ sơ thất bại!");
             }
+            activeTab = "profile";
             
         } else if ("changePassword".equals(action)) {
-            // Đổi mật khẩu
             String currentPassword = request.getParameter("currentPassword");
             String newPassword = request.getParameter("newPassword");
             String confirmPassword = request.getParameter("confirmPassword");
             
             if (!newPassword.equals(confirmPassword)) {
-                request.setAttribute("errorMessage", "Mật khẩu mới không khớp!");
+                session.setAttribute("error", "Mật khẩu mới không khớp!");
             } else if (!userDAO.checkCurrentPassword(user.getId(), currentPassword)) {
-                request.setAttribute("errorMessage", "Mật khẩu hiện tại không đúng!");
+                session.setAttribute("error", "Mật khẩu hiện tại không đúng!");
             } else if (newPassword.length() < 6) {
-                request.setAttribute("errorMessage", "Mật khẩu mới phải có ít nhất 6 ký tự!");
+                session.setAttribute("error", "Mật khẩu mới phải có ít nhất 6 ký tự!");
             } else {
                 boolean changed = userDAO.changePassword(user.getId(), newPassword);
                 if (changed) {
-                    request.setAttribute("successMessage", "Đổi mật khẩu thành công!");
+                    session.setAttribute("success", "Đổi mật khẩu thành công!");
                 } else {
-                    request.setAttribute("errorMessage", "Đổi mật khẩu thất bại!");
+                    session.setAttribute("error", "Đổi mật khẩu thất bại!");
                 }
             }
+            activeTab = "security";
+            
         } else if ("cancelOrder".equals(action)) {
-            // Hủy đơn hàng
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             boolean cancelled = orderDAO.cancelOrder(orderId);
             
@@ -140,11 +145,7 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
         
-        // Lấy lại danh sách đơn hàng
-        List<Order> orders = orderDAO.getOrdersByUserId(user.getId());
-        request.setAttribute("orders", orders);
-        request.setAttribute("activeTab", "profile");
-        request.getRequestDispatcher("/profile.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/profile?tab=" + activeTab);
     }
     
     private void handleAvatarUpload(HttpServletRequest request, HttpServletResponse response, User user)
@@ -157,6 +158,7 @@ public class ProfileServlet extends HttpServlet {
             if (filePart == null || filePart.getSize() == 0) {
                 jsonResponse.put("success", false);
                 jsonResponse.put("message", "Vui lòng chọn ảnh!");
+                response.setContentType("application/json; charset=UTF-8");
                 response.getWriter().write(new Gson().toJson(jsonResponse));
                 return;
             }
