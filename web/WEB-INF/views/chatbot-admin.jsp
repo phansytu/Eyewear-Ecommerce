@@ -6,6 +6,7 @@
 <div class="admin-chatbot-container" id="adminChatbotPanel">
     <div class="admin-panel-header">
         <h3>⚙️ Admin Chatbot Manager</h3>
+        
         <button id="minimizePanel" class="minimize-btn">−</button>
     </div>
     
