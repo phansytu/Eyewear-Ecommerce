@@ -324,8 +324,20 @@
                                                         </strong>
                                                     </div>
                                                 </div>
-                                                
-                                                <c:if test="${order.status == 'pending'}">
+                                                        
+                                                        <div class="d-flex justify-content-end gap-2 mt-3">
+        <c:forEach var="detail" items="${order.orderDetails}">
+            <button class="btn btn-sm btn-outline-primary" onclick="buyAgain(${detail.productId})">
+                <i class="fas fa-shopping-cart me-1"></i> Mua lại
+            </button>
+            <c:if test="${order.status == 'delivered'}">
+                <button class="btn btn-sm btn-outline-warning" onclick="goToReview(${detail.productId})">
+                    <i class="fas fa-star me-1"></i> Đánh giá
+                </button>
+            </c:if>
+        </c:forEach>
+    </div>
+                                             <c:if test="${order.status == 'pending'}">
                                                     <div class="text-end mt-2">
                                                         <button class="btn btn-sm btn-danger cancel-order-btn" data-order-id="${order.id}">
                                                             <i class="fas fa-times me-1"></i> Hủy đơn hàng
@@ -430,6 +442,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script>
+    
+    
+    
+    
+    
     let cropper;
     let currentFile;
     const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
@@ -562,6 +579,39 @@
         });
     });
     
+        // ===== THÊM 2 HÀM NÀY =====
+    window.buyAgain = function(productId) {
+        var fd = new URLSearchParams();
+        fd.append('action', 'add');
+        fd.append('productId', productId);
+        fd.append('quantity', '1');
+        
+        fetch('${root}/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: fd
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                alert('✅ Đã thêm vào giỏ hàng!');
+            } else {
+                alert('❌ ' + data.message);
+            }
+        })
+        .catch(function(err) {
+            alert('Có lỗi xảy ra!');
+        });
+    };
+
+    window.goToReview = function(productId) {
+        window.location.href = '${root}/product?id=' + productId + '#reviews';
+    };
+    // ===== KẾT THÚC THÊM =====
+
+    
+    
+    
     // Cancel order
     document.querySelectorAll('.cancel-order-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
@@ -590,6 +640,39 @@
             }
         });
     });
+
+// Mua lại sản phẩm
+function buyAgain(productId) {
+    var fd = new URLSearchParams();
+    fd.append('action', 'add');
+    fd.append('productId', productId);
+    fd.append('quantity', '1');
+    
+    fetch('${root}/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: fd
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            alert('✅ Đã thêm vào giỏ hàng!');
+        } else {
+            alert('❌ ' + data.message);
+        }
+    })
+    .catch(function(err) {
+        console.error('Error:', err);
+        alert('Có lỗi xảy ra!');
+    });
+}
+
+// Đi đến trang đánh giá sản phẩm
+function goToReview(productId) {
+    window.location.href = '${root}/product?id=' + productId + '#reviews';
+}
+
+
 </script>
 </body>
 </html> 

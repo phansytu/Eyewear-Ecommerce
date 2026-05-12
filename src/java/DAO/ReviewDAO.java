@@ -19,14 +19,12 @@ public class ReviewDAO {
      */
     public List<ProductReview> getReviewsByProductId(int productId, int limit, int offset) {
         List<ProductReview> reviews = new ArrayList<>();
-        String sql = """
-            SELECT r.*, u.username, u.full_name, u.avatar
-            FROM product_reviews r
-            LEFT JOIN users u ON r.user_id = u.id
-            WHERE r.product_id = ? AND r.status = 'approved'
-            ORDER BY r.created_at DESC
-            LIMIT ? OFFSET ?
-            """;
+        String sql = "SELECT r.*, u.username, u.full_name, u.avatar " +
+                     "FROM product_reviews r " +
+                     "LEFT JOIN users u ON r.user_id = u.id " +
+                     "WHERE r.product_id = ? AND r.status = 'approved' " +
+                     "ORDER BY r.created_at DESC " +
+                     "LIMIT ? OFFSET ?";
         
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -63,9 +61,7 @@ public class ReviewDAO {
     }
     
     /**
-     * Lấy điểm đánh giá trung bình của sản phẩm
-     * @param productId ID sản phẩm
-     * @return Điểm trung bình (làm tròn 1 chữ số thập phân)
+     * Lấy điểm đánh giá trung bình
      */
     public double getAverageRating(int productId) {
         String sql = "SELECT COALESCE(AVG(rating), 0) as avg_rating FROM product_reviews WHERE product_id = ? AND status = 'approved'";
@@ -74,9 +70,7 @@ public class ReviewDAO {
             ps.setInt(1, productId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                double avg = rs.getDouble("avg_rating");
-                // Làm tròn đến 1 chữ số thập phân
-                return Math.round(avg * 10) / 10.0;
+                return Math.round(rs.getDouble("avg_rating") * 10) / 10.0;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,10 +79,10 @@ public class ReviewDAO {
     }
     
     /**
-     * Lấy thống kê đánh giá theo số sao
+     * Lấy thống kê đánh giá theo số sao (index 0 = 5 sao, 4 = 1 sao)
      */
     public int[] getRatingStatistics(int productId) {
-        int[] stats = new int[5]; // 1-5 sao
+        int[] stats = new int[5];
         String sql = "SELECT rating, COUNT(*) as count FROM product_reviews WHERE product_id = ? AND status = 'approved' GROUP BY rating";
         
         try (Connection conn = DBConnect.getConnection();
@@ -99,7 +93,7 @@ public class ReviewDAO {
                 int rating = rs.getInt("rating");
                 int count = rs.getInt("count");
                 if (rating >= 1 && rating <= 5) {
-                    stats[rating - 1] = count;
+                    stats[5 - rating] = count;
                 }
             }
         } catch (SQLException e) {
@@ -109,7 +103,7 @@ public class ReviewDAO {
     }
     
     /**
-     * Lấy phần trăm đánh giá theo từng mức sao
+     * Lấy phần trăm đánh giá
      */
     public int[] getRatingPercentages(int productId) {
         int total = getTotalReviewsCount(productId);
@@ -167,34 +161,13 @@ public class ReviewDAO {
     }
     
     /**
-     * Lấy đánh giá của user cho sản phẩm
-     */
-    public ProductReview getUserReview(int userId, int productId) {
-        String sql = "SELECT * FROM product_reviews WHERE user_id = ? AND product_id = ?";
-        try (Connection conn = DBConnect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setInt(2, productId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return mapResultSetToReview(rs);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    /**
      * Lấy phản hồi của review
      */
     private ReviewReply getReplyByReviewId(int reviewId) {
-        String sql = """
-            SELECT r.*, u.username, u.full_name, u.role
-            FROM review_replies r
-            LEFT JOIN users u ON r.user_id = u.id
-            WHERE r.review_id = ?
-            """;
+        String sql = "SELECT r.*, u.username, u.full_name, u.role " +
+                     "FROM review_replies r " +
+                     "LEFT JOIN users u ON r.user_id = u.id " +
+                     "WHERE r.review_id = ?";
         
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -222,16 +195,10 @@ public class ReviewDAO {
      * Cập nhật thống kê rating cho product
      */
     private void updateProductRatingStats(int productId) {
-        String sql = """
-            UPDATE products p
-            SET p.total_reviews = (
-                SELECT COUNT(*) FROM product_reviews WHERE product_id = ? AND status = 'approved'
-            ),
-            p.average_rating = (
-                SELECT COALESCE(AVG(rating), 0) FROM product_reviews WHERE product_id = ? AND status = 'approved'
-            )
-            WHERE p.id = ?
-            """;
+        String sql = "UPDATE products p " +
+                     "SET p.total_reviews = (SELECT COUNT(*) FROM product_reviews WHERE product_id = ? AND status = 'approved'), " +
+                     "p.average_rating = (SELECT COALESCE(AVG(rating), 0) FROM product_reviews WHERE product_id = ? AND status = 'approved') " +
+                     "WHERE p.id = ?";
         
         try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

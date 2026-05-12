@@ -14,17 +14,14 @@ public class Order {
     private Integer voucherId;
     private String paymentStatus;
     
-    // Thông tin khách hàng từ bảng users (JOIN)
     private String customerUsername;
     private String customerFullName;
     private String customerEmail;
     
     private List<OrderDetail> orderDetails;
     
-    // Constructors
     public Order() {}
     
-    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     
@@ -64,7 +61,6 @@ public class Order {
     public String getCustomerEmail() { return customerEmail; }
     public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
     
-    // Helper method lấy tên hiển thị khách hàng
     public String getCustomerDisplayName() {
         if (customerFullName != null && !customerFullName.trim().isEmpty()) {
             return customerFullName;
@@ -75,30 +71,48 @@ public class Order {
         return "Khách #" + userId;
     }
     
-   
-// Helper method cho status
-    
-    
-// Trong Order.java, thêm các phương thức helper cho status
-public String getStatusText() {
-    switch(status) {
-        case "pending": return "Chờ thanh toán";
-        case "confirmed": return "Đã xác nhận";
-        case "shipping": return "Đang giao hàng";
-        case "delivered": return "Giao hàng thành công";
-        case "cancelled": return "Đã hủy";
-        default: return status;
+    public String getStatusText() {
+        switch(status != null ? status : "") {
+            case "pending": return "Chờ xác nhận";
+            case "confirmed": return "Đã xác nhận";
+            case "shipping": return "Đang giao hàng";
+            case "delivered": return "Hoàn thành";
+            case "cancelled": return "Đã hủy";
+            default: return status;
+        }
     }
-}
-
-public String getStatusClass() {
-    switch(status) {
-        case "pending": return "warning";
-        case "confirmed": return "info";
-        case "shipping": return "primary";
-        case "delivered": return "success";
-        case "cancelled": return "danger";
-        default: return "secondary";
+    
+    public String getStatusClass() {
+        switch(status != null ? status : "") {
+            case "pending": return "warning";
+            case "confirmed": return "info";
+            case "shipping": return "primary";
+            case "delivered": return "success";
+            case "cancelled": return "danger";
+            default: return "secondary";
+        }
     }
-}
+    
+    // ✅ THÊM 2 METHOD NÀY
+    public String getStatusBadgeClass() {
+        switch(status != null ? status : "") {
+            case "pending": return "status-processing";
+            case "confirmed": return "status-processing";
+            case "shipping": return "status-shipped";
+            case "delivered": return "status-delivered";
+            case "cancelled": return "status-cancelled";
+            default: return "";
+        }
+    }
+    
+    public String getStatusIcon() {
+        switch(status != null ? status : "") {
+            case "pending": return "fa-clock";
+            case "confirmed": return "fa-check-circle";
+            case "shipping": return "fa-truck";
+            case "delivered": return "fa-check-double";
+            case "cancelled": return "fa-times-circle";
+            default: return "fa-info-circle";
+        }
+    }
 }

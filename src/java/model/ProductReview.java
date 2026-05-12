@@ -63,16 +63,17 @@ public class ProductReview {
     
     // Helper methods
     public String getTimeAgo() {
-        long diff = System.currentTimeMillis() - createdAt.getTime();
-        long minutes = diff / (60 * 1000);
-        long hours = minutes / 60;
-        long days = hours / 24;
-        
-        if (minutes < 1) return "Vừa xong";
-        if (minutes < 60) return minutes + " phút trước";
-        if (hours < 24) return hours + " giờ trước";
-        return days + " ngày trước";
-    }
+    if (createdAt == null) return "";
+    long diff = System.currentTimeMillis() - createdAt.getTime();
+    long minutes = diff / (60 * 1000);
+    long hours = minutes / 60;
+    long days = hours / 24;
+    
+    if (minutes < 1) return "Vừa xong";
+    if (minutes < 60) return minutes + " phút trước";
+    if (hours < 24) return hours + " giờ trước";
+    return days + " ngày trước";
+}
 }
 
 // model/ReviewReply.java

@@ -577,4 +577,28 @@ public class OrderDAO {
         
         return order;
     }
+
+
+/**
+ * Kiểm tra user đã mua sản phẩm chưa (đơn hàng đã giao)
+ */
+public boolean hasUserPurchasedProduct(int userId, int productId) {
+    String sql = "SELECT COUNT(*) FROM order_details od " +
+                 "JOIN orders o ON od.order_id = o.id " +
+                 "WHERE o.user_id = ? AND od.product_id = ? AND o.status = 'delivered'";
+    
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        ps.setInt(2, productId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
 }
