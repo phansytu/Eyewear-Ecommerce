@@ -194,7 +194,7 @@
                                         <a href="${root}/payment?orderId=${order.id}" class="btn-buy-again">
                                             <i class="fas fa-credit-card me-2"></i>Thanh toán ngay
                                         </a>
-                                        <button class="btn-cancel" onclick="cancelOrder(${order.id})">
+                                        <button class="btn-cancel" id="cancelBtn${order.id}" data-order-id="${order.id}">
                                             <i class="fas fa-times me-2"></i>Hủy đơn
                                         </button>
                                     </c:if>
@@ -212,7 +212,7 @@
                                     </c:if>
                                     
                                     <c:if test="${order.status != 'cancelled' && order.status != 'delivered'}">
-                                        <a href="#" class="btn-contact">
+                                       <a href="${root}/contact?orderId=${order.id}" class="btn-contact">
                                             <i class="fas fa-headset me-2"></i>Liên hệ
                                         </a>
                                     </c:if>
@@ -230,29 +230,42 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const contextPath = '${root}';
+(function() {
+    var _orderCtx = '${root}';
     
-    async function cancelOrder(orderId) {
+    function cancelOrder(orderId) {
         if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
-            try {
-                const response = await fetch(contextPath + '/cart', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ action: 'cancelOrder', orderId: orderId })
-                });
-                const data = await response.json();
+            var params = new URLSearchParams();
+            params.append('action', 'cancelOrder');
+            params.append('orderId', orderId);
+            
+            fetch(_orderCtx + '/profile', {
+                method: 'POST',
+                body: params
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
                 if (data.success) {
-                    alert('Đã hủy đơn hàng thành công!');
+                    alert('✅ ' + data.message);
                     location.reload();
                 } else {
-                    alert(data.message || 'Hủy đơn hàng thất bại!');
+                    alert('❌ ' + data.message);
                 }
-            } catch (error) {
-                console.error('Error:', error);
+            })
+            .catch(function() {
                 alert('Có lỗi xảy ra!');
-            }
+            });
         }
     }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-order-id]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                cancelOrder(this.getAttribute('data-order-id'));
+            });
+        });
+    });
+})();
 </script>
 </body>
 </html>

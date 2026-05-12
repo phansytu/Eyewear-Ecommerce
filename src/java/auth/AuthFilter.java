@@ -13,7 +13,7 @@ import java.io.IOException;
  *
  * @author Admin
  */
-@WebFilter(urlPatterns = {"/cart/*", "/order/*", "/admin/*"})
+//@WebFilter(urlPatterns = {"/cart/*", "/order/*", "/admin/*"})
 public class AuthFilter implements Filter {
     
     @Override

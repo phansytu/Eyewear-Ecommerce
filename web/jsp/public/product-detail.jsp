@@ -243,11 +243,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 var _uploadedImages = [];
+var _ctx = '${pageContext.request.contextPath}';
+var _productId = ${product.id};
+var _selectedVariantId = null;
+var _selectedRating = 0;
+var _currentReviewPage = 1;
 
 // Preview ảnh khi chọn
 document.getElementById('reviewImageInput').addEventListener('change', function(e) {
     var files = e.target.files;
     var previewDiv = document.getElementById('imagePreview');
+    previewDiv.innerHTML = '';
     
     for (var i = 0; i < files.length; i++) {
         var reader = new FileReader();
@@ -264,175 +270,158 @@ document.getElementById('reviewImageInput').addEventListener('change', function(
 // Upload từng ảnh
 async function uploadImages(files) {
     var urls = [];
-    var baseUrl = '${pageContext.request.contextPath}';
     for (var i = 0; i < files.length; i++) {
         var fd = new FormData();
         fd.append('image', files[i]);
-        
         try {
-            var res = await fetch(baseUrl + '/upload-review-image', { method: 'POST', body: fd });
+            var res = await fetch(_ctx + '/upload-review-image', { method: 'POST', body: fd });
             var data = await res.json();
-            if (data.success) {
-                urls.push(data.url);
-            }
-        } catch(e) {
-            console.error('Upload failed:', e);
-        }
+            if (data.success) { urls.push(data.url); }
+        } catch(e) { console.error('Upload failed:', e); }
     }
     return urls;
 }
 
-
-
-(  
-            function() {
-    var _ctx = '${pageContext.request.contextPath}';
-    var _productId = ${product.id};
-    var _selectedVariantId = null;
-    var _selectedRating = 0;
-    var _currentReviewPage = 1;
-
-    // Ảnh
-    window.changeMainImage = function(src, el) {
-        document.getElementById('mainProductImage').src = src;
-        document.querySelectorAll('.thumbnail-img').forEach(function(i) { i.classList.remove('active'); });
-        el.classList.add('active');
-    };
-    
-    // Số lượng
-    window.changeQty = function(d) {
-        var inp = document.getElementById('quantity');
-        var v = parseInt(inp.value) + d;
-        if (v < 1) v = 1;
-        if (v > parseInt(inp.max)) v = parseInt(inp.max);
-        inp.value = v;
-    };
-    
-    // Variant
-    document.querySelectorAll('.variant-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.variant-btn').forEach(function(b) { b.classList.remove('active', 'btn-danger'); });
-            this.classList.add('active', 'btn-danger');
-            _selectedVariantId = this.dataset.id;
-        });
-    });
-    
-    // Giỏ hàng
-    window.addToCartDetail = function() {
-        <c:if test="${empty sessionScope.user}">
-            if (confirm('Vui lòng đăng nhập!')) window.location.href = _ctx + '/login';
-            return;
-        </c:if>
-        var qty = document.getElementById('quantity').value;
-        var fd = new URLSearchParams();
-        fd.append('action', 'add'); fd.append('productId', _productId); fd.append('quantity', qty);
-        if (_selectedVariantId) fd.append('variantId', _selectedVariantId);
-        fetch(_ctx + '/cart', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd })
-        .then(function(r) { return r.json(); })
-        .then(function(d) { alert(d.message); if (d.cartCount) updateCartBadge(d.cartCount); });
-    };
-    
-    window.updateCartBadge = function(c) {
-        var b = document.getElementById('cartCountBadge');
-        if (b) { b.textContent = c; b.style.display = c > 0 ? 'inline-block' : 'none'; }
-    };
-    
-    window.buyNow = function() { 
-        addToCartDetail(); 
-        setTimeout(function() { window.location.href = _ctx + '/cart'; }, 500); 
-    };
-    
-    // Đánh giá - Stars
-    document.querySelectorAll('#starRating i').forEach(function(s) {
-        s.addEventListener('click', function() {
-            _selectedRating = parseInt(this.dataset.star);
-            updateReviewStars();
-        });
-        s.addEventListener('mouseenter', function() {
-            var v = parseInt(this.dataset.star);
-            document.querySelectorAll('#starRating i').forEach(function(x, i) {
-                x.className = i < v ? 'fas fa-star text-warning' : 'far fa-star text-warning';
-            });
-        });
-        s.addEventListener('mouseleave', updateReviewStars);
-    });
-    
-    function updateReviewStars() {
-        document.querySelectorAll('#starRating i').forEach(function(x, i) {
-            x.className = i < _selectedRating ? 'fas fa-star text-warning' : 'far fa-star text-warning';
-        });
-    }
-    
-    // Load reviews
-    function loadReviews(page) {
-        fetch(_ctx + '/review?action=list&productId=' + _productId + '&page=' + page)
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            document.getElementById('avgRating').textContent = data.average;
-            document.getElementById('totalReviews').textContent = data.total + ' đánh giá';
-            
-            var starsHtml = '';
-            for (var i = 1; i <= 5; i++) {
-                starsHtml += i <= Math.round(data.average) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-            }
-            document.getElementById('avgStars').innerHTML = starsHtml;
-            
-            var statsHtml = '';
-            for (var j = 0; j < 5; j++) {
-                var count = data.ratingStats[j] || 0;
-                var pct = data.total > 0 ? (count / data.total * 100) : 0;
-                statsHtml += '<div class="d-flex align-items-center mb-1">' +
-                    '<span class="me-2" style="width:40px;">' + (5-j) + ' ★</span>' +
-                    '<div class="review-bar flex-grow-1"><div class="review-bar-fill" style="width:' + pct + '%"></div></div>' +
-                    '<span class="ms-2" style="width:30px;">' + count + '</span></div>';
-            }
-            document.getElementById('ratingStats').innerHTML = statsHtml;
-            
-            var html = '';
-if (data.reviews && data.reviews.length > 0) {
-    data.reviews.forEach(function(r) {
-        var stars = '';
-        for (var k = 0; k < 5; k++) {
-            stars += k < r.rating ? '<i class="fas fa-star text-warning"></i>' : '<i class="far fa-star text-warning"></i>';
-        }
-        var avatar = r.userName ? r.userName.charAt(0).toUpperCase() : 'U';
-        html += '<div class="review-item">' +
-            '<div class="d-flex align-items-center mb-2">' +
-                '<div class="review-avatar me-3">' + avatar + '</div>' +
-                '<div><strong>' + (r.userName || 'Ẩn danh') + '</strong>' +
-                '<div class="text-muted small">' + (r.timeAgo || '') + '</div></div>' +
-                '<div class="ms-auto">' + stars + '</div>' +
-            '</div>' +
-            '<p>' + (r.comment || '') + '</p>';
-        // Hiển thị ảnh đánh giá
-        if (r.imageList && r.imageList.length > 0) {
-            html += '<div class="d-flex gap-2 flex-wrap mt-2">';
-            r.imageList.forEach(function(img) {
-                html += '<img src="' + img + '" style="width:80px;height:80px;object-fit:cover;border-radius:6px;cursor:pointer;" onclick="window.open(\'' + img + '\')" onerror="this.style.display=\'none\'">';
-            });
-            html += '</div>';
-        }
-        html += '</div>';
-    });
-} else {
-    html = '<div class="text-center py-4 text-muted">Chưa có đánh giá nào!</div>';
+// Ảnh
+function changeMainImage(src, el) {
+    document.getElementById('mainProductImage').src = src;
+    document.querySelectorAll('.thumbnail-img').forEach(function(i) { i.classList.remove('active'); });
+    el.classList.add('active');
 }
-            if (page === 1) document.getElementById('reviewsList').innerHTML = html;
-            else document.getElementById('reviewsList').insertAdjacentHTML('beforeend', html);
-            document.getElementById('loadMoreContainer').style.display = data.hasMore ? 'block' : 'none';
-            _currentReviewPage = page;
+
+// Số lượng
+function changeQty(d) {
+    var inp = document.getElementById('quantity');
+    var v = parseInt(inp.value) + d;
+    if (v < 1) v = 1;
+    if (v > parseInt(inp.max)) v = parseInt(inp.max);
+    inp.value = v;
+}
+
+// Variant
+document.querySelectorAll('.variant-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.variant-btn').forEach(function(b) { b.classList.remove('active', 'btn-danger'); });
+        this.classList.add('active', 'btn-danger');
+        _selectedVariantId = this.dataset.id;
+    });
+});
+
+// Giỏ hàng
+function addToCartDetail() {
+    <c:if test="${empty sessionScope.user}">
+        if (confirm('Vui lòng đăng nhập!')) window.location.href = _ctx + '/login';
+        return;
+    </c:if>
+    var qty = document.getElementById('quantity').value;
+    var fd = new URLSearchParams();
+    fd.append('action', 'add'); fd.append('productId', _productId); fd.append('quantity', qty);
+    if (_selectedVariantId) fd.append('variantId', _selectedVariantId);
+    fetch(_ctx + '/cart', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { alert(d.message); if (d.cartCount) updateCartBadge(d.cartCount); });
+}
+
+function updateCartBadge(c) {
+    var b = document.getElementById('cartCountBadge');
+    if (b) { b.textContent = c; b.style.display = c > 0 ? 'inline-block' : 'none'; }
+}
+
+function buyNow() { 
+    addToCartDetail(); 
+    setTimeout(function() { window.location.href = _ctx + '/cart'; }, 500); 
+}
+
+// Đánh giá - Stars
+document.querySelectorAll('#starRating i').forEach(function(s) {
+    s.addEventListener('click', function() {
+        _selectedRating = parseInt(this.dataset.star);
+        updateReviewStars();
+    });
+    s.addEventListener('mouseenter', function() {
+        var v = parseInt(this.dataset.star);
+        document.querySelectorAll('#starRating i').forEach(function(x, i) {
+            x.className = i < v ? 'fas fa-star text-warning' : 'far fa-star text-warning';
         });
-    }
-    
-    window.loadMoreReviews = function() { loadReviews(_currentReviewPage + 1); };
-    
-    window.submitReview = async function() {
+    });
+    s.addEventListener('mouseleave', updateReviewStars);
+});
+
+function updateReviewStars() {
+    document.querySelectorAll('#starRating i').forEach(function(x, i) {
+        x.className = i < _selectedRating ? 'fas fa-star text-warning' : 'far fa-star text-warning';
+    });
+}
+
+// Load reviews
+function loadReviews(page) {
+    fetch(_ctx + '/review?action=list&productId=' + _productId + '&page=' + page)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        document.getElementById('avgRating').textContent = data.average;
+        document.getElementById('totalReviews').textContent = data.total + ' đánh giá';
+        
+        var starsHtml = '';
+        for (var i = 1; i <= 5; i++) {
+            starsHtml += i <= Math.round(data.average) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+        }
+        document.getElementById('avgStars').innerHTML = starsHtml;
+        
+        var statsHtml = '';
+        for (var j = 0; j < 5; j++) {
+            var count = data.ratingStats[j] || 0;
+            var pct = data.total > 0 ? (count / data.total * 100) : 0;
+            statsHtml += '<div class="d-flex align-items-center mb-1">' +
+                '<span class="me-2" style="width:40px;">' + (5-j) + ' ★</span>' +
+                '<div class="review-bar flex-grow-1"><div class="review-bar-fill" style="width:' + pct + '%"></div></div>' +
+                '<span class="ms-2" style="width:30px;">' + count + '</span></div>';
+        }
+        document.getElementById('ratingStats').innerHTML = statsHtml;
+        
+        var html = '';
+        if (data.reviews && data.reviews.length > 0) {
+            data.reviews.forEach(function(r) {
+                var stars = '';
+                for (var k = 0; k < 5; k++) {
+                    stars += k < r.rating ? '<i class="fas fa-star text-warning"></i>' : '<i class="far fa-star text-warning"></i>';
+                }
+                var avatar = r.userName ? r.userName.charAt(0).toUpperCase() : 'U';
+                html += '<div class="review-item">' +
+                    '<div class="d-flex align-items-center mb-2">' +
+                        '<div class="review-avatar me-3">' + avatar + '</div>' +
+                        '<div><strong>' + (r.userName || 'Ẩn danh') + '</strong>' +
+                        '<div class="text-muted small">' + (r.timeAgo || '') + '</div></div>' +
+                        '<div class="ms-auto">' + stars + '</div>' +
+                    '</div>' +
+                    '<p>' + (r.comment || '') + '</p>';
+                if (r.imageList && r.imageList.length > 0) {
+                    html += '<div class="d-flex gap-2 flex-wrap mt-2">';
+                    r.imageList.forEach(function(img) {
+                        html += '<img src="' + img + '" style="width:80px;height:80px;object-fit:cover;border-radius:6px;cursor:pointer;" onclick="window.open(\'' + img + '\')" onerror="this.style.display=\'none\'">';
+                    });
+                    html += '</div>';
+                }
+                html += '</div>';
+            });
+        } else {
+            html = '<div class="text-center py-4 text-muted">Chưa có đánh giá nào!</div>';
+        }
+        
+        if (page === 1) document.getElementById('reviewsList').innerHTML = html;
+        else document.getElementById('reviewsList').insertAdjacentHTML('beforeend', html);
+        document.getElementById('loadMoreContainer').style.display = data.hasMore ? 'block' : 'none';
+        _currentReviewPage = page;
+    });
+}
+
+function loadMoreReviews() { loadReviews(_currentReviewPage + 1); }
+
+async function submitReview() {
     if (_selectedRating === 0) { alert('Vui lòng chọn số sao!'); return; }
     
     var comment = document.getElementById('reviewComment').value;
     var imageFiles = document.getElementById('reviewImageInput').files;
     
-    // Upload ảnh trước
     var imageUrls = [];
     if (imageFiles.length > 0) {
         imageUrls = await uploadImages(imageFiles);
@@ -461,23 +450,21 @@ if (data.reviews && data.reviews.length > 0) {
             document.getElementById('reviewComment').value = '';
             document.getElementById('reviewImageInput').value = '';
             document.getElementById('imagePreview').innerHTML = '';
-            _uploadedImages = [];
             loadReviews(1);
         }
     });
-};
-    
-        // Init
-    document.addEventListener('DOMContentLoaded', function() {
-        loadReviews(1);
-        var btnSubmit = document.getElementById('btnSubmitReview');
-        if (btnSubmit) {
-            btnSubmit.addEventListener('click', function() { submitReview(); });
-        }
-    });
+}
 
-})();
-
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+    loadReviews(1);
+    var btnSubmit = document.getElementById('btnSubmitReview');
+    if (btnSubmit) {
+        btnSubmit.addEventListener('click', function() { submitReview(); });
+    }
+});
 </script>
+</body>
+</html>
 </body>
 </html>
