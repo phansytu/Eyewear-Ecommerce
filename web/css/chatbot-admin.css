@@ -27,7 +27,7 @@
 .admin-panel-header {
     background: linear-gradient(135deg, #f59e0b, #ef4444);
     color: white;
-    padding: 12px 16px;
+    padding: 12px px;
     display: flex;
     justify-content: space-between;
     align-items: center;
