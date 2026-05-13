@@ -10,21 +10,19 @@ public class OTPDao {
      * ENUM trong DB: 'unlock', 'reset_password'
      */
     private String validateType(String type) {
-        if (type == null) return "unlock";
-        
-        String normalized = type.toLowerCase().trim();
-        
-        // Kiểm tra giá trị hợp lệ
-        if (normalized.equals("reset_password") || normalized.equals("reset") || normalized.equals("forgot_password")) {
-            return "reset_password";
-        }
-        if (normalized.equals("unlock") || normalized.equals("lock") || normalized.equals("unlock_account")) {
-            return "unlock";
-        }
-        
-        // Giá trị mặc định
+    if (type == null) return "reset";
+    
+    String normalized = type.toLowerCase().trim();
+    
+    if (normalized.equals("reset_password") || normalized.equals("reset") || normalized.equals("forgot_password")) {
+        return "reset";  // ✅ Database có ENUM 'reset'
+    }
+    if (normalized.equals("unlock") || normalized.equals("lock") || normalized.equals("unlock_account")) {
         return "unlock";
     }
+    
+    return "reset";  // Mặc định
+}
 
     // Lưu OTP
     public boolean saveOTP(int userId, String otp, String type, int expiryMinutes) {
