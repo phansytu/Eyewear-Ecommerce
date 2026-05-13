@@ -100,17 +100,55 @@
             </nav>
         </div>
         
-        <!-- Banner -->
-        <div class="hero-banner">
-            <div class="banner-grid">
-                <div class="banner-card">
-                    <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&h=400&q=80" alt="Banner chính">
+        <!-- Banner Slider -->
+<div class="hero-banner">
+    <div id="mainBanner" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="2"></button>
+        </div>
+        
+        <!-- Slides -->
+        <div class="carousel-inner rounded-4 shadow">
+            <div class="carousel-item active">
+                <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1200&h=400&q=80" 
+                     class="d-block w-100" alt="Banner 1" style="height: 400px; object-fit: cover;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h3 class="fw-bold">Kính mắt thời trang 2026</h3>
+                    <p>Giảm đến 30% cho bộ sưu tập mới</p>
                 </div>
-                <div class="banner-card">
-                    <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=600&h=400&q=80" alt="Banner phụ">
+            </div>
+            <div class="carousel-item">
+                <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1200&h=400&q=80" 
+                     class="d-block w-100" alt="Banner 2" style="height: 400px; object-fit: cover;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h3 class="fw-bold">Kính râm cao cấp</h3>
+                    <p>Chống UV 100% - Bảo vệ đôi mắt của bạn</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+               <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1200&h=400&q=80" 
+                     class="d-block w-100" alt="Banner 3" style="height: 400px; object-fit: cover;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h3 class="fw-bold">Gọng kính nhẹ Titanium</h3>
+                    <p>Siêu nhẹ - Siêu bền - Sang trọng</p>
                 </div>
             </div>
         </div>
+        
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#mainBanner" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#mainBanner" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
         
         <!-- Content Row -->
         <div class="row g-4">
