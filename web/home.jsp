@@ -182,6 +182,53 @@
                                 </label>
                             </div>
                         </div>
+                                    
+                           <!-- Thương hiệu -->
+<div class="filter-group">
+    <label class="filter-label">🏷️ Thương hiệu</label>
+    <div class="radio-group">
+        <label class="radio-item">
+            <input type="radio" name="brand" value="" ${empty param.brand ? 'checked' : ''}>
+            <span>Tất cả</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Ray-Ban" ${param.brand == 'Ray-Ban' ? 'checked' : ''}>
+            <span>Ray-Ban</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Gucci" ${param.brand == 'Gucci' ? 'checked' : ''}>
+            <span>Gucci</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Dior" ${param.brand == 'Dior' ? 'checked' : ''}>
+            <span>Dior</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Oakley" ${param.brand == 'Oakley' ? 'checked' : ''}>
+            <span>Oakley</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Prada" ${param.brand == 'Prada' ? 'checked' : ''}>
+            <span>Prada</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Tom Ford" ${param.brand == 'Tom Ford' ? 'checked' : ''}>
+            <span>Tom Ford</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Essilor" ${param.brand == 'Essilor' ? 'checked' : ''}>
+            <span>Essilor</span>
+        </label>
+        <label class="radio-item">
+            <input type="radio" name="brand" value="Zeiss" ${param.brand == 'Zeiss' ? 'checked' : ''}>
+            <span>Zeiss</span>
+        </label>
+    </div>
+</div>         
+                                    
+                                    
+                                    
+                                    
                         
                         <input type="hidden" name="sort" id="sortInput" value="${param.sort != null ? param.sort : 'newest'}">
                         <button type="submit" class="filter-btn"><i class="fas fa-filter me-2"></i>Áp dụng bộ lọc</button>

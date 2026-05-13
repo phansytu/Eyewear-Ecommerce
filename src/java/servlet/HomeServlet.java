@@ -28,6 +28,7 @@ public class HomeServlet extends HttpServlet {
             String maxPrice = request.getParameter("maxPrice");
             String gender = request.getParameter("gender");
             String frameMaterial = request.getParameter("frameMaterial");
+            String brand = request.getParameter("brand");
             String sort = request.getParameter("sort");
             String rating = request.getParameter("rating");
             String pageStr = request.getParameter("page");
@@ -64,8 +65,10 @@ public class HomeServlet extends HttpServlet {
             
             // Lấy danh sách sản phẩm theo bộ lọc
             // Thay vì gọi phương thức 8 tham số, hãy gọi phương thức có sẵn
+if (brand == null || brand.isEmpty()) brand = null;
+
 List<Product> allProducts = productDAO.searchProductsAdvanced(
-    null, null, minPrice, maxPrice, gender, frameMaterial, sort
+    null, null, minPrice, maxPrice, gender, frameMaterial, brand, sort
 );
             
             // Tính toán phân trang
@@ -112,12 +115,12 @@ List<Product> allProducts = productDAO.searchProductsAdvanced(
             request.setAttribute("selectedSort", sort);
             
             // Forward to JSP
-            request.getRequestDispatcher("/home.jsp").forward(request, response);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setContentType("text/html; charset=UTF-8");
-            response.getWriter().write("<h1>Lỗi: " + e.getMessage() + "</h1>");
+                request.getRequestDispatcher("/home.jsp").forward(request, response);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setContentType("text/html; charset=UTF-8");
+                response.getWriter().write("<h1>Lỗi: " + e.getMessage() + "</h1>");
+            }
         }
     }
-}

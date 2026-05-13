@@ -239,8 +239,9 @@ public class ProductDAO {
     /**
      * Tìm kiếm sản phẩm nâng cao với nhiều bộ lọc
      */
-    public List<Product> searchProductsAdvanced(String keyword, String categoryId, String minPrice, 
-                                                 String maxPrice, String gender, String frameMaterial, String sort) {
+   public List<Product> searchProductsAdvanced(String keyword, String categoryId, String minPrice, 
+                                             String maxPrice, String gender, String frameMaterial, 
+                                             String brand, String sort) {
         List<Product> products = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
             SELECT p.*, c.name as category_name,
@@ -289,6 +290,15 @@ public class ProductDAO {
             sql.append(" AND p.frame_material = ?");
             params.add(frameMaterial);
         }
+        
+                
+        // Lọc theo thương hiệu
+        if (brand != null && !brand.isEmpty() && !brand.equals("all")) {
+            sql.append(" AND p.brand = ?");
+            params.add(brand);
+        }
+        
+        
         
         
 switch (sort) {
@@ -772,105 +782,7 @@ private String convertGender(String displayGender) {
     /**
  * Tìm kiếm sản phẩm nâng cao với nhiều bộ lọc (có rating)
  */
-public List<Product> searchProductsAdvanced(String keyword, String categoryId, String minPrice, 
-                                             String maxPrice, String gender, String frameMaterial, 
-                                             String rating, String sort) {
-    List<Product> products = new ArrayList<>();
-    StringBuilder sql = new StringBuilder("""
-        SELECT p.*, c.name as category_name,
-               COALESCE(p.average_rating, 0) as average_rating,
-               COALESCE(p.total_reviews, 0) as total_reviews
-        FROM products p 
-        LEFT JOIN categories c ON p.category_id = c.id 
-        WHERE p.status = 'active'
-        """);
-    
-    List<Object> params = new ArrayList<>();
-    
-    // Tìm kiếm theo từ khóa
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND (p.name LIKE ? OR p.brand LIKE ? OR p.description LIKE ?)");
-        String searchPattern = "%" + keyword.trim() + "%";
-        params.add(searchPattern);
-        params.add(searchPattern);
-        params.add(searchPattern);
-    }
-    
-    // Lọc theo danh mục
-    if (categoryId != null && !categoryId.isEmpty() && !categoryId.equals("0")) {
-        sql.append(" AND p.category_id = ?");
-        params.add(Integer.parseInt(categoryId));
-    }
-    
-    // Lọc theo giá
-    if (minPrice != null && !minPrice.isEmpty()) {
-        sql.append(" AND p.sale_price >= ?");
-        params.add(new BigDecimal(minPrice));
-    }
-    if (maxPrice != null && !maxPrice.isEmpty()) {
-        sql.append(" AND p.sale_price <= ?");
-        params.add(new BigDecimal(maxPrice));
-    }
-    
-    // Lọc theo giới tính
-    if (gender != null && !gender.isEmpty() && !gender.equals("all")) {
-        sql.append(" AND p.gender = ?");
-        params.add(gender);
-    }
-    
-    // Lọc theo chất liệu gọng
-    if (frameMaterial != null && !frameMaterial.isEmpty() && !frameMaterial.equals("all")) {
-        sql.append(" AND p.frame_material = ?");
-        params.add(frameMaterial);
-    }
-    
-    // Lọc theo đánh giá (thêm mới)
-    if (rating != null && !rating.isEmpty()) {
-        sql.append(" AND p.average_rating >= ?");
-        params.add(Double.parseDouble(rating));
-    }
-    
-    // Sắp xếp
-    switch (sort) {
-        case "price_asc":
-            sql.append(" ORDER BY p.sale_price ASC");
-            break;
-        case "price_desc":
-            sql.append(" ORDER BY p.sale_price DESC");
-            break;
-        case "name_asc":
-            sql.append(" ORDER BY p.name ASC");
-            break;
-        case "rating_desc":
-            sql.append(" ORDER BY p.average_rating DESC, p.total_reviews DESC");
-            break;
-        case "best_seller":
-            sql.append(" ORDER BY p.sold_quantity DESC, p.total_reviews DESC");
-            break;
-        default: // newest
-            sql.append(" ORDER BY p.created_at DESC");
-            break;
-    }
-    
-    try (Connection conn = DBConnect.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-        
-        for (int i = 0; i < params.size(); i++) {
-            ps.setObject(i + 1, params.get(i));
-        }
-        
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Product product = extractProductBasic(rs);
-            product.setAverageRating(rs.getDouble("average_rating"));
-            product.setTotalReviews(rs.getInt("total_reviews"));
-            products.add(product);
-        }
-    } catch (SQLException e) {
-        System.err.println("❌ searchProductsAdvanced: " + e.getMessage());
-    }
-    return products;
-}
+
 /**
  * Cập nhật số lượng đã bán khi có đơn hàng thành công
  * @param productId ID sản phẩm
