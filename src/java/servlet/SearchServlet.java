@@ -30,6 +30,7 @@ public class SearchServlet extends HttpServlet {
             String maxPrice = request.getParameter("maxPrice");
             String gender = request.getParameter("gender");
             String frameMaterial = request.getParameter("frameMaterial");
+            String brand = request.getParameter("brand");
             String sort = request.getParameter("sort");
             
             // Xử lý giá trị null
@@ -41,9 +42,11 @@ public class SearchServlet extends HttpServlet {
             if (sort == null || sort.isEmpty()) sort = "newest";
             
             // Lấy danh sách sản phẩm theo bộ lọc
-            List<Product> products = productDAO.searchProductsAdvanced(
-                keyword, categoryId, minPrice, maxPrice, gender, frameMaterial, sort
-            );
+            if (brand == null || brand.isEmpty() || brand.equals("all")) brand = null;
+
+List<Product> products = productDAO.searchProductsAdvanced(
+    keyword, categoryId, minPrice, maxPrice, gender, frameMaterial, brand, sort
+);
             
             // Lấy danh sách danh mục cho filter
             List<Category> categories = categoryDAO.getAllCategories();

@@ -7,11 +7,12 @@
 
 body {
     background: linear-gradient(
-    to bottom,
-    #ffffff 0%,
-    #dffcff 20%
-    /*#00838f 100%*/
-);
+        to bottom,
+        #ffffff 0%,
+        #f8f9fa 50%,
+        #e9ecef 100%
+    );
+    
 
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #333;
@@ -24,11 +25,9 @@ body {
         to top,
         #ffffff 0%,
         #dff9fb 25%
-/*        #7ed6df 60%,
-        #22a6b3 100%*/
     );
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    padding: 10px 20px;
+    padding: 0px 0px;
 }
 
 .logo {
@@ -206,32 +205,94 @@ body {
     font-size: 16px;
 }
 
-/* Banner Styles */
-.hero-banner {
-    margin-bottom: 24px;
-}
-
-.banner-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
-}
-
-.banner-card {
-    border-radius: 16px;
+/* Banner Slider */
+.carousel {
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.3s;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    margin-bottom: 25px;
 }
 
-.banner-card:hover {
-    transform: translateY(-4px);
+.carousel-item img {
+    transition: transform 0.8s ease;
 }
 
-.banner-card img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
+.carousel-item:hover img {
+    transform: scale(1.02);
+}
+
+.carousel-caption {
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+    border-radius: 10px;
+    padding: 20px 30px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 90%;
+}
+
+.carousel-caption h3 {
+    font-size: 28px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 5px;
+}
+
+.carousel-caption p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: transparent;
+    opacity: 0.8;
+    transition: all 0.3s;
+}
+
+.carousel-indicators button.active {
+    background: white;
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 15px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.carousel:hover .carousel-control-prev,
+.carousel:hover .carousel-control-next {
+    opacity: 1;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background: rgba(255,255,255,0.4);
+}
+
+@media (max-width: 768px) {
+    .carousel-item img {
+        height: 250px !important;
+    }
+    .carousel-caption h3 {
+        font-size: 18px;
+    }
+    .carousel-caption p {
+        font-size: 14px;
+    }
 }
 
 /* Filter Sidebar */
@@ -244,7 +305,152 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     border: 1px solid #eee;
 }
+/* filter-dropdown.css */
 
+/* Container cho mỗi nhóm filter */
+.filter-group {
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Header của filter (có thể click để mở/đóng) */
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+.filter-header:hover {
+    color: #e11b1b;
+}
+
+.filter-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.filter-header i {
+    transition: transform 0.3s;
+}
+
+.filter-header.open i {
+    transform: rotate(180deg);
+}
+
+/* Nội dung filter (thả xuống) */
+.filter-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    padding: 0 4px;
+}
+
+.filter-content.open {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-bottom: 12px;
+}
+
+/* Scrollbar cho filter content */
+.filter-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.filter-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.filter-content::-webkit-scrollbar-thumb {
+    background: #e11b1b;
+    border-radius: 4px;
+}
+
+/* Các option trong filter */
+.filter-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 6px;
+}
+
+.filter-option:hover {
+    background: #f5f5f5;
+}
+
+.filter-option input {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #e11b1b;
+}
+
+.filter-option label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+}
+
+.filter-option .count {
+    font-size: 12px;
+    color: #999;
+    margin-left: 8px;
+}
+
+/* Selected badge */
+.selected-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.selected-badge {
+    background: #f0f0f0;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.selected-badge span {
+    color: #e11b1b;
+    font-weight: 500;
+}
+
+.selected-badge button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 12px;
+    padding: 0;
+}
+
+.selected-badge button:hover {
+    color: #e11b1b;
+}
+
+.clear-all {
+    color: #e11b1b;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: auto;
+}
 .filter-title {
     font-size: 18px;
     font-weight: 700;
@@ -254,9 +460,9 @@ body {
     display: inline-block;
 }
 
-.filter-group {
+/*.filter-group {
     margin-bottom: 24px;
-}
+}*/
 
 .filter-label {
     font-size: 14px;
@@ -565,3 +771,258 @@ body {
         min-width: 100%;
     }
 }
+/* ==================== CẤU TRÚC FILTER MỚI ==================== */
+
+/* Container filter-group - đã có border-bottom */
+.filter-group {
+    margin-bottom: 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* Header filter - có thể click */
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.filter-header:hover .filter-label {
+    color: #e11b1b;
+}
+
+.filter-header .filter-label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.filter-header i {
+    transition: transform 0.3s;
+    color: #999;
+    font-size: 14px;
+}
+
+.filter-header.open i {
+    transform: rotate(180deg);
+}
+
+/* Nội dung filter thả xuống */
+.filter-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.filter-content.open {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-bottom: 16px;
+}
+
+/* Scrollbar cho filter content */
+.filter-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.filter-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.filter-content::-webkit-scrollbar-thumb {
+    background: #e11b1b;
+    border-radius: 4px;
+}
+
+/* Radio group bên trong filter content */
+.filter-content .radio-group {
+    gap: 12px;
+}
+
+.filter-content .radio-item {
+    padding: 6px 0;
+}
+
+/* ==================== SELECTED BADGES ==================== */
+.selected-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.selected-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 30px;
+    padding: 5px 12px;
+    font-size: 12px;
+}
+
+.selected-badge i {
+    color: #e11b1b;
+    font-size: 12px;
+}
+
+.selected-badge span {
+    color: #333;
+}
+
+.selected-badge .remove-badge {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 14px;
+    padding: 0;
+    margin-left: 4px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.selected-badge .remove-badge:hover {
+    color: #e11b1b;
+}
+
+.clear-all {
+    color: #e11b1b;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 4px 8px;
+}
+
+.clear-all:hover {
+    text-decoration: underline;
+}
+
+/* ==================== PRICE PRESETS ==================== */
+.price-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.price-preset {
+    background: #f5f5f5;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.price-preset:hover {
+    background: #e11b1b;
+    color: white;
+}
+
+/* ==================== ẨN CÁC PHẦN CŨ KHÔNG DÙNG ==================== */
+/* Ẩn filter-label cũ trong filter-group (vì đã dùng filter-header) */
+.filter-group:not(.has-header) > .filter-label {
+    display: block;
+}
+
+/* Đảm bảo radio-group trong filter-content được style đẹp */
+.filter-content .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-content .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.filter-content .radio-item input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #e11b1b;
+}
+
+.filter-content .radio-item span {
+    font-size: 13px;
+    color: #555;
+}
+
+.filter-content .radio-item .count {
+    font-size: 11px;
+    color: #999;
+    margin-left: auto;
+}
+/* Đảm bảo filter group thương hiệu có cùng style */
+.filter-group.has-header .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.filter-group.has-header .filter-header .filter-label {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.filter-group.has-header .filter-header i {
+    transition: transform 0.3s;
+    color: #999;
+}
+
+.filter-group.has-header .filter-header.open i {
+    transform: rotate(180deg);
+}
+
+.filter-group.has-header .filter-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.filter-group.has-header .filter-content.open {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-bottom: 16px;
+}
+
+/* Radio group trong filter content */
+.filter-content .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-content .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    cursor: pointer;
+}
+
+.filter-content .radio-item input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #e11b1b;
+}
+
+.filter-content .radio-item span {
+    font-size: 13px;
+    color: #555;
+}
+

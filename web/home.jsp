@@ -100,100 +100,220 @@
             </nav>
         </div>
         
-        <!-- Banner -->
-        <div class="hero-banner">
-            <div class="banner-grid">
-                <div class="banner-card">
-                    <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&h=400&q=80" alt="Banner chính">
+        <!-- Banner Slider -->
+<div class="hero-banner">
+    <div id="mainBanner" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="2"></button>
+        </div>
+        
+        <!-- Slides -->
+        <div class="carousel-inner rounded-4 shadow">
+            <div class="carousel-item active">
+                <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1200&h=400&q=80" 
+                     class="d-block w-100" alt="Banner 1" style="height: 400px; object-fit: cover;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h3 class="fw-bold">Kính mắt thời trang 2026</h3>
+                    <p>Giảm đến 30% cho bộ sưu tập mới</p>
                 </div>
-                <div class="banner-card">
-                    <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=600&h=400&q=80" alt="Banner phụ">
+            </div>
+            <div class="carousel-item">
+                <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1200&h=400&q=80" 
+                     class="d-block w-100" alt="Banner 2" style="height: 400px; object-fit: cover;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h3 class="fw-bold">Kính râm cao cấp</h3>
+                    <p>Chống UV 100% - Bảo vệ đôi mắt của bạn</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+               <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1200&h=400&q=80" 
+                     class="d-block w-100" alt="Banner 3" style="height: 400px; object-fit: cover;">
+                <div class="carousel-caption d-none d-md-block">
+                    <h3 class="fw-bold">Gọng kính nhẹ Titanium</h3>
+                    <p>Siêu nhẹ - Siêu bền - Sang trọng</p>
                 </div>
             </div>
         </div>
         
-        <!-- Content Row -->
-        <div class="row g-4">
-            <!-- Sidebar Filter -->
-            <div class="col-lg-3">
-                <div class="filter-sidebar">
-                    <h3 class="filter-title">Bộ lọc sản phẩm</h3>
-                    
-                    <form id="filterForm" method="GET" action="${root}/home">
-                        <!-- Giá -->
-                        <div class="filter-group">
-                            <label class="filter-label">💰 Giá</label>
-                            <div class="price-inputs">
-                                <input type="number" name="minPrice" placeholder="Từ" value="${param.minPrice}">
-                                <input type="number" name="maxPrice" placeholder="Đến" value="${param.maxPrice}">
-                            </div>
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#mainBanner" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#mainBanner" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+        
+<!-- Content Row -->
+<div class="row g-4">
+    <!-- Sidebar Filter -->
+    <div class="col-lg-3">
+        <div class="filter-sidebar">
+            <h3 class="filter-title">Bộ lọc sản phẩm</h3>
+            
+            <!-- Selected filters sẽ hiển thị ở đây -->
+            <div class="selected-filters"></div>
+            
+            <form id="filterForm" method="GET" action="${root}/home">
+                
+                <!-- FILTER: GIÁ (có dropdown) -->
+                <div class="filter-group has-header">
+                    <div class="filter-header">
+                        <label class="filter-label">💰 Giá</label>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="filter-content">
+                        <div class="price-inputs">
+                            <input type="number" name="minPrice" placeholder="Từ" value="${param.minPrice}">
+                            <input type="number" name="maxPrice" placeholder="Đến" value="${param.maxPrice}">
                         </div>
-                        
-                        <!-- Giới tính -->
-                        <div class="filter-group">
-                            <label class="filter-label">👤 Giới tính</label>
-                            <div class="radio-group">
-                                <label class="radio-item">
-                                    <input type="radio" name="gender" value="" ${empty param.gender ? 'checked' : ''}>
-                                    <span>Tất cả</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="gender" value="Nam" ${param.gender == 'Nam' ? 'checked' : ''}>
-                                    <span><i class="fas fa-mars me-1"></i>Nam</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="gender" value="Nữ" ${param.gender == 'Nữ' ? 'checked' : ''}>
-                                    <span><i class="fas fa-venus me-1"></i>Nữ</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="gender" value="Unisex" ${param.gender == 'Unisex' ? 'checked' : ''}>
-                                    <span><i class="fas fa-genderless me-1"></i>Unisex</span>
-                                </label>
-                            </div>
+                        <div class="price-presets">
+                            <button type="button" class="price-preset" data-min="0" data-max="500000">Dưới 500k</button>
+                            <button type="button" class="price-preset" data-min="500000" data-max="1000000">500k - 1tr</button>
+                            <button type="button" class="price-preset" data-min="1000000" data-max="2000000">1tr - 2tr</button>
+                            <button type="button" class="price-preset" data-min="2000000" data-max="5000000">2tr - 5tr</button>
+                            <button type="button" class="price-preset" data-min="5000000" data-max="0">Trên 5tr</button>
                         </div>
-                        
-                        <!-- Chất liệu -->
-                        <div class="filter-group">
-                            <label class="filter-label">🔧 Chất liệu</label>
-                            <div class="radio-group">
-                                <label class="radio-item">
-                                    <input type="radio" name="frameMaterial" value="" ${empty param.frameMaterial ? 'checked' : ''}>
-                                    <span>Tất cả</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="frameMaterial" value="Titanium" ${param.frameMaterial == 'Titanium' ? 'checked' : ''}>
-                                    <span>Titanium</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="frameMaterial" value="Acetate" ${param.frameMaterial == 'Acetate' ? 'checked' : ''}>
-                                    <span>Acetate</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="frameMaterial" value="Metal" ${param.frameMaterial == 'Metal' ? 'checked' : ''}>
-                                    <span>Metal</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="frameMaterial" value="Plastic" ${param.frameMaterial == 'Plastic' ? 'checked' : ''}>
-                                    <span>Plastic</span>
-                                </label>
-                                <label class="radio-item">
-                                    <input type="radio" name="frameMaterial" value="TR90" ${param.frameMaterial == 'TR90' ? 'checked' : ''}>
-                                    <span>TR90</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <input type="hidden" name="sort" id="sortInput" value="${param.sort != null ? param.sort : 'newest'}">
-                        <button type="submit" class="filter-btn"><i class="fas fa-filter me-2"></i>Áp dụng bộ lọc</button>
-                        
-                        <c:if test="${not empty param.minPrice or not empty param.maxPrice or not empty param.gender or not empty param.frameMaterial}">
-                            <a href="${root}/home" class="btn btn-link text-danger mt-2 w-100 text-decoration-none">
-                                <i class="fas fa-times-circle me-1"></i>Xóa tất cả bộ lọc
-                            </a>
-                        </c:if>
-                    </form>
+                    </div>
                 </div>
-            </div>
+                
+                <!-- FILTER: GIỚI TÍNH (có dropdown) -->
+                <div class="filter-group has-header">
+                    <div class="filter-header">
+                        <label class="filter-label">👤 Giới tính</label>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="filter-content">
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="" ${empty param.gender ? 'checked' : ''}>
+                                <span>Tất cả</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="Nam" ${param.gender == 'Nam' ? 'checked' : ''}>
+                                <span><i class="fas fa-mars me-1"></i>Nam</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="Nữ" ${param.gender == 'Nữ' ? 'checked' : ''}>
+                                <span><i class="fas fa-venus me-1"></i>Nữ</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="gender" value="Unisex" ${param.gender == 'Unisex' ? 'checked' : ''}>
+                                <span><i class="fas fa-genderless me-1"></i>Unisex</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FILTER: CHẤT LIỆU (có dropdown) -->
+                <div class="filter-group has-header">
+                    <div class="filter-header">
+                        <label class="filter-label">🔧 Chất liệu</label>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="filter-content">
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="" ${empty param.frameMaterial ? 'checked' : ''}>
+                                <span>Tất cả</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Titanium" ${param.frameMaterial == 'Titanium' ? 'checked' : ''}>
+                                <span>Titanium</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Acetate" ${param.frameMaterial == 'Acetate' ? 'checked' : ''}>
+                                <span>Acetate</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Metal" ${param.frameMaterial == 'Metal' ? 'checked' : ''}>
+                                <span>Metal</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="Plastic" ${param.frameMaterial == 'Plastic' ? 'checked' : ''}>
+                                <span>Plastic</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="frameMaterial" value="TR90" ${param.frameMaterial == 'TR90' ? 'checked' : ''}>
+                                <span>TR90</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FILTER: THƯƠNG HIỆU (có dropdown) - SỬA ĐÚNG CẤU TRÚC -->
+                <div class="filter-group has-header">
+                    <div class="filter-header">
+                        <label class="filter-label">🏷️ Thương hiệu</label>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="filter-content">
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="" ${empty param.brand ? 'checked' : ''}>
+                                <span>Tất cả</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Ray-Ban" ${param.brand == 'Ray-Ban' ? 'checked' : ''}>
+                                <span>Ray-Ban</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Gucci" ${param.brand == 'Gucci' ? 'checked' : ''}>
+                                <span>Gucci</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Dior" ${param.brand == 'Dior' ? 'checked' : ''}>
+                                <span>Dior</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Oakley" ${param.brand == 'Oakley' ? 'checked' : ''}>
+                                <span>Oakley</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Prada" ${param.brand == 'Prada' ? 'checked' : ''}>
+                                <span>Prada</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Tom Ford" ${param.brand == 'Tom Ford' ? 'checked' : ''}>
+                                <span>Tom Ford</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Essilor" ${param.brand == 'Essilor' ? 'checked' : ''}>
+                                <span>Essilor</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="brand" value="Zeiss" ${param.brand == 'Zeiss' ? 'checked' : ''}>
+                                <span>Zeiss</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <input type="hidden" name="sort" id="sortInput" value="${param.sort != null ? param.sort : 'newest'}">
+                <!-- Thêm id cho nút áp dụng -->
+<button type="button" id="applyFilterBtn" class="filter-btn">
+    <i class="fas fa-filter me-2"></i>Áp dụng bộ lọc
+</button>
+                
+                <!-- THÊM NÚT XÓA DUY NHẤT NÀY -->
+<div class="d-flex gap-2 mt-3">
+    <button type="button" id="clearAllFiltersBtn" class="filter-btn">
+        <i class="fas fa-trash-alt me-1"></i>Xóa hết
+    </button>
+</div>
+            </form>
+        </div>
+    </div>
+    
+    
+   
+
             
             <!-- Product Section -->
             <div class="col-lg-9">
@@ -284,6 +404,7 @@
                     </div>
                 </c:if>
             </div>
+                </div>
         </div>
     </main>
     

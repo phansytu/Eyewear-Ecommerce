@@ -328,8 +328,31 @@ function updateCartBadge(c) {
 }
 
 function buyNow() { 
-    addToCartDetail(); 
-    setTimeout(function() { window.location.href = _ctx + '/cart'; }, 500); 
+    <c:if test="${empty sessionScope.user}">
+        if (confirm('Vui lòng đăng nhập!')) window.location.href = _ctx + '/login';
+        return;
+    </c:if>
+    
+    var qty = document.getElementById('quantity').value;
+    var fd = new URLSearchParams();
+    fd.append('action', 'add');
+    fd.append('productId', _productId);
+    fd.append('quantity', qty);
+    if (_selectedVariantId) fd.append('variantId', _selectedVariantId);
+    
+    fetch(_ctx + '/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: fd
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.success) {
+            window.location.href = _ctx + '/checkout';
+        } else {
+            alert(d.message);
+        }
+    });
 }
 
 // Đánh giá - Stars

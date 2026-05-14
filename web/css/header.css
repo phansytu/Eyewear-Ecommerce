@@ -15,3 +15,60 @@
 .dropdown-content a:hover { background-color: #f1f1f1; }
 /* Class này sẽ được JS thêm vào khi click */
 .show { display: block; }
+
+
+.logo-brand {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.logo-img {
+    width: 25px;      /* thu nhỏ logo */
+    height: 25px;
+    object-fit: contain;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.logo-title {
+    font-size: 14px;   /* nhỏ hơn */
+    font-weight: 700;  /* 12 là sai */
+    color: #333;
+    margin: 0;
+}
+
+.logo-subtitle {
+    font-size: 6px;
+    color: #999;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.logo-title {
+    background: linear-gradient(90deg, #0f172a, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+.logo-subtitle {
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 3px;
+    font-weight: 500;
+}

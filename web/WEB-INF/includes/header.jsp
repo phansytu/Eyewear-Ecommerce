@@ -8,10 +8,11 @@
     <div class="container-fluid px-4">
         <div class="row align-items-center">
             <div class="col-md-3">
-                <a href="${root}/home" class="logo">
-                    TuKhanhHuy
-                    <span>Kính mắt chính hãng</span>
-                </a>
+                <a href="${root}/home" class="logo-brand">
+    <img src="${root}/image/logo/logo3.svg" alt="TuKhanhHuy" style="height: 80px; width: auto; max-width: 350px;">
+    
+    
+</a>
             </div>
             <div class="col-md-6">
                 <div class="search-wrapper">
