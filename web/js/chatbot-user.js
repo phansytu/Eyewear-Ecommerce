@@ -3,7 +3,7 @@
     'use strict';
     
     // ⭐ SỬA LẠI API URL - Gọi trực tiếp sang Python server
-    const API_URL = 'http://localhost:5000/api/chat';
+    const API_URL = 'https://chatbotkinhmat.onrender.com/api/chat';
     let sessionId = null;
     let isOpen = false;
     

@@ -9,7 +9,7 @@
     const chatbotSendBtn = document.getElementById('chatbotSendBtn');
     const chatbotMessages = document.getElementById('chatbotMessages');
     
-    const API_URL = window.CHATBOT_API_URL || 'http://localhost:5000/api/chat';
+    const API_URL = window.CHATBOT_API_URL || 'https://chatbotkinhmat.onrender.com/api/chat';
     let sessionId = null;
     let isOpen = false;
     

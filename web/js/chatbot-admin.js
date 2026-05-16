@@ -1,6 +1,6 @@
 // chatbot-admin.js
 // ⭐ SỬA LẠI API URL - Gọi trực tiếp sang Python server
-const API_BASE_URL = 'http://localhost:5000/api';  // Thay vì gọi qua Java backend
+const API_BASE_URL = 'https://chatbotkinhmat.onrender.com/api';  // Thay vì gọi qua Java backend
 
 let unresolvedInterval = null;
 
