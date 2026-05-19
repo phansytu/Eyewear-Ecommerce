@@ -9,7 +9,7 @@
         <div class="row align-items-center">
             <div class="col-md-3">
                 <a href="${root}/home" class="logo-brand">
-    <img src="${root}/image/logo/logo3.svg" alt="TuKhanhHuy" style="height: 80px; width: auto; max-width: 350px;">
+    <img src="${root}/image/logo/logo5.svg" alt="TuKhanhHuy" style="width: 200px;  height: auto;  fill: white; padding-left: 40px">
     
     
 </a>
@@ -63,12 +63,14 @@
                     </a>
                 </div>
             </div>
+                        <hr>
         </div>
     </div>
 </div>
-
+                        
 <!-- Navbar Menu -->
 <div class="navbar-menu">
+    
     <div class="container-fluid px-4">
         <ul class="navbar-list">
             <li><a href="${root}/home">Trang chủ</a></li>
