@@ -1,8 +1,8 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
+
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <%-- Bảo vệ trang admin --%>
@@ -390,64 +390,25 @@
                         const lastLoginDate = u.lastLogin ? new Date(u.lastLogin).toLocaleString('vi-VN') : 'Chưa đăng nhập';
                         
                         // Trong phần xem chi tiết người dùng, thay thế nội dung của contentDiv.innerHTML
-
-contentDiv.innerHTML = `
-    <div class="row">
-        <div class="col-md-4 text-center">
-            <div class="mb-3">
-                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
-                     style="width: 120px; height: 120px; font-size: 48px;">
-                    ${u.username ? u.username.charAt(0).toUpperCase() : 'U'}
-                </div>
-            </div>
-            <h5>${escapeHtml(u.full_name || u.username)}</h5>
-            <p class="text-muted">@${escapeHtml(u.username)}</p>
-        </div>
-        <div class="col-md-8">
-            <table class="table table-bordered">
-                <tr><th style="width: 35%">Email</th><td>${escapeHtml(u.email || 'N/A')}</td></tr>
-                <tr><th>Số điện thoại</th><td>${escapeHtml(u.phone || 'Chưa cập nhật')}</td></tr>
-                <tr><th>Địa chỉ</th><td>${escapeHtml(u.address || 'Chưa cập nhật')}</td></tr>
-                <tr><th>Giới tính</th><td>${escapeHtml(u.gender || 'Chưa cập nhật')}</td></tr>
-                <tr><th>Ngày sinh</th><td>${escapeHtml(u.dob || 'Chưa cập nhật')}</td></tr>
-                <tr><th>Ngày đăng ký</th><td>${createDate}</td></tr>
-                <tr><th>Lần đăng nhập cuối</th><td>${lastLoginDate}</td></tr>
-                <tr>
-                    <th>Vai trò</th>
-                    <td>
-    <c:choose>
-        <c:when test="${u.role == 'admin'}">
-            <span class="badge bg-danger">Quản trị viên</span>
-        </c:when>
-        <c:otherwise>
-            <span class="badge bg-secondary">Khách hàng</span>
-        </c:otherwise>
-    </c:choose>
-</td>
-                </tr>
-                <tr>
-                    <th>Trạng thái</th>
-                    <td>
-    <c:choose>
-        <c:when test="${u.status == 'active'}">
-            <span class="badge badge-active">Hoạt động</span>
-        </c:when>
-        <c:when test="${u.status == 'locked'}">
-            <span class="badge badge-locked">Đã khóa</span>
-        </c:when>
-        <c:otherwise>
-            <span class="badge badge-inactive">Không hoạt động</span>
-        </c:otherwise>
-    </c:choose>
-</td>
-                </tr>
-                <tr class="table-info"><th>Tổng đơn hàng</th><td><strong>${u.totalOrders || 0}</strong> đơn</td></tr>
-                <tr class="table-info"><th>Tổng chi tiêu</th><td class="text-danger fw-bold">${totalSpentFormatted}</td></tr>
-                <tr class="table-warning"><th>Hạng khách hàng</th><td><span class="badge ${u.tierBadgeClass || 'badge-tier-potential'}">${u.customerTier || 'Tiềm năng'}</span></td></tr>
-            </table>
-        </div>
-    </div>
-`;
+                            contentDiv.innerHTML = '<div class="row">' +
+    '<div class="col-md-4 text-center">' +
+        '<div class="mb-3">' +
+            '<div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" ' +
+                 'style="width: 120px; height: 120px; font-size: 48px;">' +
+                 (u.username ? u.username.charAt(0).toUpperCase() : 'U') +
+            '</div>' +
+        '</div>' +
+        '<h5>' + escapeHtml(u.full_name || u.username) + '</h5>' +
+        '<p class="text-muted">@' + escapeHtml(u.username) + '</p>' +
+    '</div>' +
+    '<div class="col-md-8">' +
+        '<table class="table table-bordered">' +
+            '<tr><th style="width: 35%">Email</th><td>' + escapeHtml(u.email || 'N/A') + '</td></tr>' +
+            '<tr><th>Số điện thoại</th><td>' + escapeHtml(u.phone || 'Chưa cập nhật') + '</td></tr>' +
+            // ... tiếp tục
+        '</table>' +
+    '</div>' +
+'</div>';
                     } else {
                         contentDiv.innerHTML = `<div class="text-center py-4 text-danger"><i class="fa-solid fa-circle-exclamation fa-3x mb-3"></i><p>${data.message || 'Không thể tải thông tin người dùng'}</p></div>`;
                     }

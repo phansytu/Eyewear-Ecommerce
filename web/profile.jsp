@@ -78,7 +78,7 @@
             <div class="col-md-3">
                 <a href="${root}/home" class="text-decoration-none">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-glasses text-primary fs-3 me-2"></i>
+                        
                         <span class="fw-bold fs-4 text-primary">TuKhanhHuy</span>
                     </div>
                 </a>
@@ -293,9 +293,9 @@
                                             
                                             <c:forEach var="detail" items="${order.orderDetails}" varStatus="loop">
                                                 <div class="d-flex gap-3 ${!loop.last ? 'mb-3' : ''}">
-                                                    <img src="${not empty detail.productImage ? root.concat('/').concat(detail.productImage) : root.concat('/images/no-image.png')}" 
+                                                    <img src="${not empty detail.productImage ? root.concat('/').concat(detail.productImage) : root.concat('/image/no-image.png')}" 
                                                          class="rounded border" width="80" height="80" alt="${detail.productName}"
-                                                         onerror="this.src='${root}/images/no-image.png'">
+                                                         onerror="this.src='${root}/image/no-image.png'">
                                                     <div class="flex-grow-1">
                                                         <h6 class="mb-1">${detail.productName}</h6>
                                                         <div class="d-flex justify-content-between align-items-center">

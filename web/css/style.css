@@ -117,14 +117,14 @@ body {
 .navbar-list{
     display: flex;
     justify-content: center;
-    gap: 32px;
+    gap: 40px;
 
     list-style: none;
 
     width: fit-content;
     margin: auto;
 
-    padding: 10px 20px;
+    padding: 5px 10px;
 
     border-radius: 50px;
 
@@ -169,7 +169,7 @@ body {
 .breadcrumb-area {
     background: transparent;
     padding: 5px 0;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
 
@@ -219,29 +219,42 @@ body {
 .carousel-item:hover img {
     transform: scale(1.02);
 }
-
+/* 1. Xóa nền mặc định của khung chứa lớn */
 .carousel-caption {
-    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
-    border-radius: 10px;
-    padding: 20px 30px;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    max-width: 90%;
+    background: none !important;
+    background-image: none !important;
+    
 }
 
+/* 2. Làm cho nền chạy theo tiêu đề (H3) */
 .carousel-caption h3 {
-    font-size: 28px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    margin-bottom: 5px;
+    display: inline-block;    /* Quan trọng: giúp nền co lại theo chữ */
+    background-color: rgba(0, 0, 0, 0.2); /* Nền đen mờ vừa phải */
+    color: #fff;              /* Chữ trắng */
+    padding: 8px 20px;        /* Tạo khoảng cách giữa chữ và mép nền */
+    border-radius: 10px;      /* Bo góc cho "nhãn" chữ */
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
+/* 3. Làm cho nền chạy theo đoạn văn (P) */
 .carousel-caption p {
-    font-size: 16px;
-    opacity: 0.9;
-    margin: 0;
+    display: inline-block;    /* Giúp nền co lại theo chữ */
+    background-color: rgba(0, 0, 0, 0.2); /* Nền mờ hơn tiêu đề một chút */
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 8px;
+    margin: 0 auto;           /* Căn giữa */
+    font-size: 1.1rem;
 }
+
+/* Đảm bảo mỗi dòng chữ nằm trên một hàng riêng biệt */
+.carousel-caption br {
+    display: block;
+    content: "";
+    margin-top: 5px;
+}
+
 
 .carousel-indicators button {
     width: 12px;
@@ -1024,4 +1037,54 @@ body {
     font-size: 13px;
     color: #555;
 }
+/* --- 1. Xử lý chiều cao Banner Responsive --- */
+.banner-img {
+    object-fit: cover;
+    width: 100%;
+}
 
+/* Trên điện thoại: Chiều cao nhỏ lại (khoảng 180px - 200px) để vừa tầm mắt */
+@media (max-width: 767.98px) {
+    .banner-img {
+        height: 180px; 
+    }
+}
+
+/* Trên máy tính: Chiều cao 400px như bạn mong muốn */
+@media (min-width: 768px) {
+    .banner-img {
+        height: 400px;
+    }
+}
+
+/* --- 2. Tùy chỉnh Nút Indicators (Style Shopee) --- */
+.custom-indicators {
+    margin-bottom: 10px; /* Đẩy lên một chút cho khỏi sát đáy */
+}
+
+.custom-indicators [data-bs-target] {
+    width: 8px;           /* Hình tròn nhỏ */
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.6); /* Trắng mờ */
+    border: none;
+    margin: 0 4px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Đổ bóng nhẹ để nổi bật trên ảnh sáng */
+}
+
+/* Nút đang được chọn sẽ dài ra */
+.custom-indicators .active {
+    width: 20px;          /* Kéo dài ra */
+    border-radius: 4px;   /* Bo góc thành hình viên thuốc */
+    background-color: #ffffff; /* Trắng tinh */
+    opacity: 1;
+}
+
+/* Ẩn mũi tên điều hướng (Controls) trên điện thoại vì người dùng thường vuốt (Swipe) */
+@media (max-width: 767.98px) {
+    .carousel-control-prev,
+    .carousel-control-next {
+        display: none;
+    }
+}

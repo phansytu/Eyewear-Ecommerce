@@ -23,3 +23,31 @@
     gap: 6px;
     text-decoration: none;
 }
+/* --- Desktop (Mặc định) --- */
+
+/* --- Mobile (Dưới 768px) --- */
+@media (max-width: 767.98px) {
+    /* 1. Ép các cột trong row phải xuống dòng */
+    .row.align-items-center > div {
+        width: 100% !important;
+        margin-bottom: 10px;
+        text-align: center; /* Căn giữa cho đẹp trên điện thoại */
+    }
+
+    /* 2. Thu nhỏ chữ để không bị tràn */
+    body {
+        font-size: 14px;
+    }
+
+    /* 3. Xử lý Breadcrumb sát lề hơn */
+    .breadcrumb-area {
+        padding: 5px 0 !important;
+        font-size: 12px;
+    }
+
+    /* 4. Hình ảnh sản phẩm không được quá to */
+    .product-img {
+        width: 100%;
+        height: auto;
+    }
+}

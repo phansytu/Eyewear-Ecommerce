@@ -42,7 +42,7 @@
             <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
             <h4>Sản phẩm không tồn tại!</h4>
             <a href="${root}/home" class="btn btn-danger mt-3">← Về trang chủ</a>
-        </div>
+        </div>  
     </c:if>
     
     <c:if test="${not empty product}">

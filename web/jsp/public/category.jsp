@@ -49,7 +49,7 @@
                     </c:if>
                     
                     <div class="filter-group">
-                        <label class="filter-label">💰 Giá</label>
+                        <label class="filter-label"> Giá</label>
                         <div class="price-inputs">
                             <input type="number" name="minPrice" placeholder="Từ" value="${param.minPrice}">
                             <input type="number" name="maxPrice" placeholder="Đến" value="${param.maxPrice}">
@@ -57,7 +57,7 @@
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">👤 Giới tính</label>
+                        <label class="filter-label"> Giới tính</label>
                         <div class="radio-group">
                             <label class="radio-item"><input type="radio" name="gender" value="" ${empty param.gender ? 'checked' : ''}><span>Tất cả</span></label>
                             <label class="radio-item"><input type="radio" name="gender" value="Nam" ${param.gender == 'Nam' ? 'checked' : ''}><span><i class="fas fa-mars me-1"></i>Nam</span></label>
@@ -67,7 +67,7 @@
                     </div>
                     
                     <div class="filter-group">
-                        <label class="filter-label">🔧 Chất liệu</label>
+                        <label class="filter-label">Chất liệu</label>
                         <div class="radio-group">
                             <label class="radio-item"><input type="radio" name="frameMaterial" value="" ${empty param.frameMaterial ? 'checked' : ''}><span>Tất cả</span></label>
                             <label class="radio-item"><input type="radio" name="frameMaterial" value="Titanium" ${param.frameMaterial == 'Titanium' ? 'checked' : ''}><span>Titanium</span></label>

@@ -2,34 +2,39 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:set var="root" value="${pageContext.request.contextPath}"/>
+<link rel="icon" type="image/svg+xml" href="${root}/image/logo/logo5.svg?v=1.1">
 
-<!-- Header -->
-<div class="main-header">
+<div class="main-header py-2">
     <div class="container-fluid px-4">
         <div class="row align-items-center">
-            <div class="col-md-3">
+            
+            <div class="col-12 col-md-3 text-center text-md-start mb-3 mb-md-0">
                 <a href="${root}/home" class="logo-brand">
-    <img src="${root}/image/logo/logo5.svg" alt="TuKhanhHuy" style="width: 200px;  height: auto;  fill: white; padding-left: 40px">
-    
-    
-</a>
+                    <img src="${root}/image/logo/logo5.svg" alt="TuKhanhHuy" 
+                         style="width: 180px; height: auto; max-width: 100%;">
+                </a>
             </div>
-            <div class="col-md-6">
+
+            <div class="col-12 col-md-6 mb-3 mb-md-0">
                 <div class="search-wrapper">
                     <form action="${root}/search" method="GET">
                         <div class="search-box">
-                            <input type="text" name="keyword" placeholder="Bạn tìm gì hôm nay?" value="<c:out value='${param.keyword}'/>">
+                            <input type="text" name="keyword" placeholder="Bạn tìm gì hôm nay?" 
+                                   value="<c:out value='${param.keyword}'/>" style="width: 100%;">
                             <button type="submit">Tìm kiếm</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="header-actions">
+
+            <div class="col-12 col-md-3">
+                <div class="header-actions d-flex justify-content-around justify-content-md-end gap-3">
+                    
                     <a href="${root}/home" class="header-action">
                         <i class="fas fa-home"></i>
                         <span>Trang chủ</span>
                     </a>
+
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
                             <div class="dropdown">
@@ -38,10 +43,11 @@
                                     <span>${fn:substring(sessionScope.user.full_name, 0, 10)}</span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="${root}/profile">Hồ sơ của tôi</a></li>
+                                    <li><a class="dropdown-item" href="${root}/profile">Hồ sơ & Đơn mua</a></li>
                                     <c:if test="${sessionScope.user.role eq 'admin'}">
                                         <li><a class="dropdown-item" href="${root}/admin/dashboard">Quản trị</a></li>
                                     </c:if>
+
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="${root}/logout">Đăng xuất</a></li>
                                 </ul>
@@ -54,7 +60,7 @@
                             </a>
                         </c:otherwise>
                     </c:choose>
-                    <!-- GIỎ HÀNG VỚI BADGE HIỂN THỊ SỐ LƯỢNG -->
+
                     <a href="${root}/cart" class="header-action position-relative">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Giỏ hàng</span>
@@ -63,9 +69,8 @@
                     </a>
                 </div>
             </div>
-                        <hr>
-        </div>
-    </div>
+
+        </div> </div>
 </div>
                         
 <!-- Navbar Menu -->

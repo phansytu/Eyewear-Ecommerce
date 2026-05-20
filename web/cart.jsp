@@ -4,6 +4,8 @@
 <%@ page import="model.CartItem" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="root" value="${pageContext.request.contextPath}"/>  <!-- THÊM DÒNG NÀY -->
+
 <%
     User user = (User) session.getAttribute("user");
     if (user == null) {
@@ -24,8 +26,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/cart.css">
-    
-    
 </head>
 <body>
   
@@ -85,29 +85,28 @@
                 </div>
                 
                 <div class="cart-summary">
-    <h3>Tổng giỏ hàng</h3>
-    <div class="summary-row">
-        <span>Tổng sản phẩm:</span>
-        <span id="totalQuantitySpan"><%= cart.getTotalQuantity() %></span>
-    </div>
-    <div class="summary-row total">
-        <span>Tổng tiền:</span>
-        <span id="totalPriceSpan">
-            <fmt:formatNumber value="${cart.totalPrice}" pattern="#,###"/>₫
-        </span>
-    </div>
-    
-    <button class="checkout-btn" onclick="checkout()">Tiến hành thanh toán</button>
-    <button class="clear-cart-btn" onclick="clearCart()">Xóa toàn bộ giỏ hàng</button>
-</div>
+                    <h3>Tổng giỏ hàng</h3>
+                    <div class="summary-row">
+                        <span>Tổng sản phẩm:</span>
+                        <span id="totalQuantitySpan"><%= cart.getTotalQuantity() %></span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Tổng tiền:</span>
+                        <span id="totalPriceSpan">
+                            <fmt:formatNumber value="${cart.totalPrice}" pattern="#,###"/>₫
+                        </span>
+                    </div>
+                    
+                    <button class="checkout-btn" onclick="checkout()">Tiến hành thanh toán</button>
+                    <button class="clear-cart-btn" onclick="clearCart()">Xóa toàn bộ giỏ hàng</button>
+                </div>
             </div>
         <% } %>
     </div>
     
-        <jsp:include page="/WEB-INF/includes/footer.jsp" />
+    <jsp:include page="/WEB-INF/includes/footer.jsp" />
     
-    <!-- Bootstrap JS -->
-
-<script src="${root}/js/giohangcount.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="${root}/js/giohangcount.js"></script>
 </body>
 </html>

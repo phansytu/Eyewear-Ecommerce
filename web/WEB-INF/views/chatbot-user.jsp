@@ -67,7 +67,7 @@
 </div>
 
 <script>
-    window.CHATBOT_API_URL = 'http://localhost:5000/api/chat';
+    window.CHATBOT_API_URL = 'https://chatbotkinhmat.onrender.com/api/chat';
     window.USER_ROLE = 'USER';
 </script>
 <script src="${root}/js/chatbot-user.js"></script>

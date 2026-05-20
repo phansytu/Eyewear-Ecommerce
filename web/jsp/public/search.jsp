@@ -206,7 +206,7 @@
                     
                     <!-- Giới tính -->
                     <div class="filter-group">
-                        <label><i class="fas fa-venus-mars me-1"></i>Giới tính</label>
+                        <label><i class="fas  me-1"></i>Giới tính</label>
                         <div>
                             <label class="filter-checkbox">
                                 <input type="radio" name="gender" value="all" ${empty selectedGender or selectedGender == 'all' ? 'checked' : ''}>
@@ -229,7 +229,7 @@
                     
                     <!-- Chất liệu gọng -->
                     <div class="filter-group">
-                        <label><i class="fas fa-microscope me-1"></i>Chất liệu gọng</label>
+                        <label><i class="fas  me-1"></i>Chất liệu gọng</label>
                         <select name="frameMaterial" class="form-select form-select-sm" id="frameMaterialSelect">
                             <option value="all">Tất cả</option>
                             <option value="Titanium" ${selectedFrameMaterial == 'Titanium' ? 'selected' : ''}>Titanium</option>

@@ -60,7 +60,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container-fluid px-4 py-4">
+    <main class="container-fluid px-4 py-1">
         <!-- Breadcrumb Navigation -->
         <div class="breadcrumb-area">
             <nav aria-label="breadcrumb">
@@ -101,52 +101,50 @@
         </div>
         
         <!-- Banner Slider -->
-<div class="hero-banner">
-    <div id="mainBanner" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
-        <!-- Indicators -->
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="2"></button>
+<div class="hero-banner mt-md-3"> <div class="container-fluid px-0 px-md-4"> <div id="mainBanner" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+            
+            <div class="carousel-indicators custom-indicators">
+                <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="2"></button>
+            </div>
+            
+            <div class="carousel-inner rounded-0 rounded-md-4 shadow-sm">
+                <div class="carousel-item active">
+                    <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1200&h=400&q=80" 
+                         class="d-block w-100 banner-img" alt="Banner 1">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3 class="fw-bold">Kính mắt thời trang 2026</h3><br>
+                        <p>Giảm đến 30% cho bộ sưu tập mới</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1200&h=400&q=80" 
+                         class="d-block w-100 banner-img" alt="Banner 2">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3 class="fw-bold">Kính râm cao cấp</h3><br>
+                        <p>Chống UV 100% - Bảo vệ đôi mắt của bạn</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                   <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1200&h=400&q=80" 
+                         class="d-block w-100 banner-img" alt="Banner 3">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3 class="fw-bold">Gọng kính nhẹ Titanium</h3><br>
+                        <p>Siêu nhẹ - Siêu bền - Sang trọng</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#mainBanner" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#mainBanner" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-        
-        <!-- Slides -->
-        <div class="carousel-inner rounded-4 shadow">
-            <div class="carousel-item active">
-                <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1200&h=400&q=80" 
-                     class="d-block w-100" alt="Banner 1" style="height: 400px; object-fit: cover;">
-                <div class="carousel-caption d-none d-md-block">
-                    <h3 class="fw-bold">Kính mắt thời trang 2026</h3>
-                    <p>Giảm đến 30% cho bộ sưu tập mới</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1200&h=400&q=80" 
-                     class="d-block w-100" alt="Banner 2" style="height: 400px; object-fit: cover;">
-                <div class="carousel-caption d-none d-md-block">
-                    <h3 class="fw-bold">Kính râm cao cấp</h3>
-                    <p>Chống UV 100% - Bảo vệ đôi mắt của bạn</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-               <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1200&h=400&q=80" 
-                     class="d-block w-100" alt="Banner 3" style="height: 400px; object-fit: cover;">
-                <div class="carousel-caption d-none d-md-block">
-                    <h3 class="fw-bold">Gọng kính nhẹ Titanium</h3>
-                    <p>Siêu nhẹ - Siêu bền - Sang trọng</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#mainBanner" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#mainBanner" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
     </div>
 </div>
         
@@ -165,7 +163,7 @@
                 <!-- FILTER: GIÁ (có dropdown) -->
                 <div class="filter-group has-header">
                     <div class="filter-header">
-                        <label class="filter-label">💰 Giá</label>
+                        <label class="filter-label">Giá</label>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="filter-content">
@@ -186,7 +184,7 @@
                 <!-- FILTER: GIỚI TÍNH (có dropdown) -->
                 <div class="filter-group has-header">
                     <div class="filter-header">
-                        <label class="filter-label">👤 Giới tính</label>
+                        <label class="filter-label">Giới tính</label>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="filter-content">
@@ -214,7 +212,7 @@
                 <!-- FILTER: CHẤT LIỆU (có dropdown) -->
                 <div class="filter-group has-header">
                     <div class="filter-header">
-                        <label class="filter-label">🔧 Chất liệu</label>
+                        <label class="filter-label"> Chất liệu</label>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="filter-content">
@@ -250,7 +248,7 @@
                 <!-- FILTER: THƯƠNG HIỆU (có dropdown) - SỬA ĐÚNG CẤU TRÚC -->
                 <div class="filter-group has-header">
                     <div class="filter-header">
-                        <label class="filter-label">🏷️ Thương hiệu</label>
+                        <label class="filter-label">️ Thương hiệu</label>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="filter-content">
@@ -301,8 +299,7 @@
     <i class="fas fa-filter me-2"></i>Áp dụng bộ lọc
 </button>
                 
-                <!-- THÊM NÚT XÓA DUY NHẤT NÀY -->
-<div class="d-flex gap-2 mt-3">
+<div class="d-flex gap-2 mt-1">
     <button type="button" id="clearAllFiltersBtn" class="filter-btn">
         <i class="fas fa-trash-alt me-1"></i>Xóa hết
     </button>
@@ -413,7 +410,7 @@
         <c:when test="${userRole == 'ADMIN'}">
             <jsp:include page="/WEB-INF/views/chatbot-admin.jsp" />
         </c:when>
-        <c:otherwise>
+        <c:otherwise>   
             <jsp:include page="/WEB-INF/views/chatbot-user.jsp" />
         </c:otherwise>
     </c:choose>
@@ -426,7 +423,7 @@
     <script src="${root}/js/home.js"></script>
     <script src="${root}/js/giohangcount.js"></script>
     
-    <!-- ⭐ TRUYỀN ROLE VÀ CONTEXT PATH CHO JAVASCRIPT ⭐ -->
+    
     <script>
         window.contextPath = '${root}';
         window.userRole = '${userRole}';

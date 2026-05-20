@@ -281,9 +281,14 @@ public class ProductDAO {
         
         // Lọc theo giới tính
         if (gender != null && !gender.isEmpty() && !gender.equals("all")) {
-            sql.append(" AND p.gender = ?");
-            params.add(gender);
-        }
+    sql.append(" AND p.gender = ?");
+    // Chuyển Nam/Nữ/Unisex → male/female/unisex
+    String dbGender = gender;
+    if ("Nam".equals(gender)) dbGender = "male";
+    else if ("Nữ".equals(gender)) dbGender = "female";
+    else if ("Unisex".equals(gender)) dbGender = "unisex";
+    params.add(dbGender);
+}
         
         // Lọc theo chất liệu gọng
         if (frameMaterial != null && !frameMaterial.isEmpty() && !frameMaterial.equals("all")) {
