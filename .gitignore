@@ -1,6 +1,5 @@
 # Chặn thư mục build và file tạm
 build/
-dist/
 nbbuild/
 nbdist/
 src/java/util/DBConnect.java
