@@ -5,36 +5,23 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnect {
-
-    // Lấy thông tin từ Railway Environment Variables
-    private static final String HOST = System.getenv("MYSQLHOST");
-    private static final String PORT = System.getenv("MYSQLPORT");
-    private static final String DATABASE = System.getenv("MYSQLDATABASE");
-    private static final String USER = System.getenv("MYSQLUSER");
-    private static final String PASSWORD = System.getenv("MYSQLPASSWORD");
-
-    // JDBC URL
-    private static final String URL =
-            "jdbc:mysql://" + HOST + ":" + PORT + "/" + DATABASE
-            + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static String getUrl() {
+        String rawUrl = System.getenv("MYSQL_URL");
+        // Railway cung cấp mysql://, JDBC cần jdbc:mysql://
+        if (rawUrl != null && rawUrl.startsWith("mysql://")) {
+            return rawUrl.replace("mysql://", "jdbc:mysql://");
+        }
+        // Fallback cho local (nếu bạn không set biến môi trường ở máy)
+        return "jdbc:mysql://localhost:3306/ten_db_cua_ban";
+    }
 
     public static Connection getConnection() {
         try {
-            // Load MySQL Driver
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-
-            System.out.println("✅ DB Connection OK!");
-            return conn;
-
-        } catch (ClassNotFoundException e) {
-            System.err.println("❌ MySQL Driver NOT FOUND!");
-            throw new RuntimeException(e);
-
-        } catch (SQLException e) {
-            System.err.println("❌ DB Connection FAILED: " + e.getMessage());
-            throw new RuntimeException(e);
+            // Khi dùng URL đầy đủ từ Railway, không cần truyền User/Pass riêng
+            return DriverManager.getConnection(getUrl());
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new RuntimeException("Lỗi kết nối DB: " + e.getMessage());
         }
     }
 }
