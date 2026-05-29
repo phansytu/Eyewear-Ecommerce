@@ -5,23 +5,34 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnect {
-    private static String getUrl() {
-        String rawUrl = System.getenv("MYSQL_URL");
-        // Railway cung cấp mysql://, JDBC cần jdbc:mysql://
-        if (rawUrl != null && rawUrl.startsWith("mysql://")) {
-            return rawUrl.replace("mysql://", "jdbc:mysql://");
-        }
-        // Fallback cho local (nếu bạn không set biến môi trường ở máy)
-        return "jdbc:mysql://localhost:3306/ten_db_cua_ban";
-    }
-
     public static Connection getConnection() {
+        // 1. Lấy biến từ Railway (Nếu chạy local các biến này sẽ null)
+        String host = System.getenv("MYSQLHOST");
+        String port = System.getenv("MYSQLPORT");
+        String dbName = System.getenv("MYSQLDATABASE");
+        String user = System.getenv("MYSQLUSER");
+        String pass = System.getenv("MYSQLPASSWORD");
+
+        String url = "";
+
+        if (host != null) {
+            // ĐANG CHẠY TRÊN RAILWAY: Ghép chuỗi JDBC chuẩn
+            url = "jdbc:mysql://" + host + ":" + port + "/" + dbName 
+                + "?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true";
+        } else {
+            // ĐANG CHẠY LOCAL: Thay thông số máy bạn vào đây
+            url = "jdbc:mysql://localhost:3306/ten_db_cua_ban?useUnicode=true&characterEncoding=UTF-8";
+            user = "root";
+            pass = "mat_khau_local";
+        }
+
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            // Khi dùng URL đầy đủ từ Railway, không cần truyền User/Pass riêng
-            return DriverManager.getConnection(getUrl());
+            return DriverManager.getConnection(url, user, pass);
         } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException("Lỗi kết nối DB: " + e.getMessage());
+            System.err.println("❌ Kết nối thất bại: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 }
