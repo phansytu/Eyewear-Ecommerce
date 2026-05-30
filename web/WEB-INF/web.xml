@@ -16,12 +16,4 @@
         <welcome-file>home</welcome-file>
     </welcome-file-list>
     <!-- web.xml -->
-<servlet>
-    <servlet-name>PayOSWebhookServlet</servlet-name>
-    <servlet-class>servlet.PayOSWebhookServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>PayOSWebhookServlet</servlet-name>
-    <url-pattern>/webhook/payos</url-pattern>
-</servlet-mapping>
 </web-app>
