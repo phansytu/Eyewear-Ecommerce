@@ -600,5 +600,63 @@ public boolean hasUserPurchasedProduct(int userId, int productId) {
     }
     return false;
 }
+// Thêm các phương thức vào OrderDAO.java
 
+public boolean updatePaymentLinkId(int orderId, String paymentLinkId) {
+    String sql = "UPDATE orders SET payment_link_id = ? WHERE id = ?";
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, paymentLinkId);
+        ps.setInt(2, orderId);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+public boolean updatePaymentStatus(int orderId, String status, String transactionId) {
+    String sql = "UPDATE orders SET payment_status = ?, transaction_id = ?, paid_at = NOW() WHERE id = ?";
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, status);
+        ps.setString(2, transactionId);
+        ps.setInt(3, orderId);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+public Order getOrderByPaymentLinkId(String paymentLinkId) {
+    String sql = "SELECT * FROM orders WHERE payment_link_id = ?";
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, paymentLinkId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return mapResultSetToOrder(rs);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+// DAO/OrderDAO.java - Thêm phương thức này
+
+public int getOrderIdByPaymentLinkId(String paymentLinkId) {
+    String sql = "SELECT id FROM orders WHERE payment_link_id = ?";
+    try (Connection conn = DBConnect.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, paymentLinkId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("id");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return -1;
+}
 }

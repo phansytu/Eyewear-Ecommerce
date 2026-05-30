@@ -85,7 +85,7 @@
         <a href="${root}/admin/products">
             <i class="fas fa-box me-2"></i> Quản lý sản phẩm
         </a>
-        <a href="${root}/category">
+        <a href="${root}/admin/categories">
             <i class="fas fa-list me-2"></i> Quản lý danh mục
         </a>
         <a href="${root}/admin/orders">
